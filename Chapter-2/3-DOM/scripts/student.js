@@ -125,7 +125,7 @@ async function searchStudentContent(search) {
 
     // Frontend search
     let studentContentHTML = "";
-    filteredStudent.map((student) => {
+    filteredStudent.map((body) => {
         // variable that will be show in student-content id
         const studentContent = `
             <div class="col-md-3">
