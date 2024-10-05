@@ -1,12 +1,30 @@
 const express = require("express"); // Import express with non-module
+require("express-async-errors"); // Import express-async-errors module
 const students = require("./data/students.json"); // Import students data
 const fs = require("fs"); // Import fs module
 const { z } = require("zod"); // Import zod module
 const e = require("express");
+const { error } = require("console");
 
 // Make/instantiate express application
 const app = express(); // Create express app
 const port = 3000; // Define port
+
+// Standarize the response
+const successResponse = (res, data) => {
+    res.status(200).json({
+        success: true,
+        data,
+    });
+};
+
+const badRequestError = (errors) => {
+    throw new Error({
+        errors,
+        message: "Validation failed",
+        status: 400,
+    })
+};
 
 // We need to activate body parser/reader
 app.use(express.json()); // Activate body reader
@@ -18,18 +36,58 @@ app.get("/", (req, res) => {
 });
 
 app.get("/students", (req, res) => {
-    // Define route
-    res.send(students); // Send response
+    // try {
+        // students?name=BAMARAMZY -> ramzy
+        // Validate the query
+        const validateQuery = z.object({
+            name: z.string().optional(),
+            nickname: z.string().optional(),
+            bachelor: z.string().optional(),
+        });
+    
+        const resultValidateQuery = validateQuery.safePars(req.params);
+        if (!resultValidateQuery.success) {
+            // If validation fails, return error messages
+            // return res.status(400).json({
+            //     message: "Validation failed",
+            //     errors: resultValidateQuery.error.errors.map((err) => ({
+            //         field: err.path[0],
+            //         issue: err.message,
+            //     })),
+            // });
+            badRequestError(resultValidateQuery.error.errors);
+        }
+    
+        const searchedStudent = students.filter((student) => {
+            // Do filter logic here
+            let result = true;
+            if (req.query.name) {
+                const isFoundName = student.name
+                    .toLowerCase()
+                    .includes(req.query.name.toLowerCase());
+                result = result && isFoundName;
+            }
+            if (req.query.nickname) {
+                const isFoundnickname = student.nickname
+                    .toLowerCase()
+                    .includes(req.query.nickname.toLowerCase());
+                result = result && isFoundnickname;
+            }
+            if (req.query.bachelor) {
+                const isFoundBachelor = student.education.bachelor
+                    .toLowerCase()
+                    .includes(req.query.bachelor.toLowerCase());
+                result = result && isFoundBachelor;
+            }
+    
+            return result;
+        });    
+        successResponse(res, searchedStudent);        
+    // } catch (error) {
+    //     next(error);
+    // }
+        
 });
-
-// app.get('/students/:id', (req, res) => { // Define route
-//     const student = students.find((student) => student.id === parseInt(req.params.id)); // Find student by id
-//     if (!student) { // If student not found
-//         res.status(404).send('Student not found!'); // Send response
-//     } else { // If student found
-//         res.send(student); // Send response
-//     }
-// });
 
 app.get("/students/:id", (req, res) => {
     // Make a validation schema
@@ -54,14 +112,14 @@ app.get("/students/:id", (req, res) => {
 
     // Find student by id
     const student = students.find((student) => student.id == id);
-    // If student has been found, it will be response the student data
-    if (student) {
-        res.json(student);
-        return;
+    if (!student) {
+        // If there is no student with the id that client request, it will response not found
+        // TODO: make a error class
+        return res.status(404).json({ message: "Student not found!" });
     }
 
-    // if there is no student with the id that client request, it will response not found
-    res.status(404).json({ message: "Student not found!" });
+    // If student has been found, it will be response the student data
+    successResponse(res, student);
 });
 
 app.post("/students", (req, res) => {
@@ -116,7 +174,7 @@ app.post("/students", (req, res) => {
     // });
 
     const newStudent = {
-        id: students.length + 1, // Generate new id
+        id: maxId + 1,
         ...req.body,
     };
 
@@ -135,18 +193,82 @@ app.post("/students", (req, res) => {
     // fs.writeFileSync
     // (filePath, JSON.stringify(students, null, 2)); // Write students data to file
 
-    res.status(201).json(newStudent); // Send response
+    successResponse(res, newStudent);
 });
 
-
-// TODO: Update a student: PUT /students/:id
+// Update a student: PUT /students/:id
 app.put("/students/:id", (req, res) => {
-    // TODO: zod validation
-    // TODO: Update the data
-    // TODO: Update the json data
+    // zod validation
+    const validateParams = z.object({
+        id: z.string(),
+    });
+
+    const resultValidateParams = validateParams.safeParse(req.params);
+    if (!resultValidateParams.success) {
+        // If validation fails, return error messages
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: resultValidateParams.error.errors.map((err) => ({
+                field: err.path[0],
+                issue: err.message,
+            })),
+        });
+    }
+
+    // Validation body schema
+    const validateBody = z.object({
+        name: z.string(),
+        nickname: z.string(),
+        class: z.string(),
+        address: z.object({
+            province: z.string(),
+            city: z.string(),
+        }),
+        education: z
+            .object({
+                bachelor: z.string().optional().nullable(),
+            })
+            .optional()
+            .nullable(),
+    });
+
+    // Validate
+    const resultValidateBody = validateBody.safeParse(req.body);
+    if (!resultValidateBody.success) {
+        // If validation fails, return error messages
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: resultValidateBody.error.errors.map((err) => ({
+                field: err.path[0],
+                issue: err.message,
+            })),
+        });
+    }
+
+    // Find the existing student data
+    const id = Number(req.params.id);
+    const student = students.find((student) => student.id === id);
+    if (!student) {
+        // TODO: make a error class 
+        return res.status(404).json({
+            message: "Student not found!",
+        });
+    }
+
+    // Update the data
+    Object.assign(student, resultValidateBody.data);
+
+    // Update the json data
+    fs.writeFileSync(
+        "./data/students.json",
+        JSON.stringify(students, null, 4),
+        "utf-8"
+    );
+
+    successResponse(res, student);
 });
 
-// TODO: Delete a stdudent: DELETE /students/:id using zod
+// Delete a student: DELETE /students/:id using zod
 app.delete("/students/:id", (req, res) => {
     // Make a validation schema
     const validateParams = z.object({
@@ -172,23 +294,39 @@ app.delete("/students/:id", (req, res) => {
     const studentIndex = students.findIndex((student) => student.id == id);
 
     // If the index found
-    if (studentIndex >= 0) {
-        const deletedStudent = students.splice(studentIndex, 1);
-
-        // Update the json
-        fs.writeFileSync(
-            "./data/students.json",
-            JSON.stringify(students, null, 4),
-            "utf-8"
-        );
-
-        return res
-            .status(200)
-            .json({ message: "Success", data: deletedStudent });
+    if (studentIndex < 0) {
+        // If no index found
+        return res.status.json({ message: "Student not found!" });
     }
 
-    // If no index found
-    res.status({ message: "Student not found!" });
+    // If the index found
+    const deletedStudent = students.splice(studentIndex, 1);
+
+    // Update the json
+    fs.writeFileSync(
+        "./data/students.json",
+        JSON.stringify(students, null, 4),
+        "utf-8"
+    );
+
+    successResponse(res, deletedStudent);
+});
+
+// This function is to handle error when API hit
+app.use((err, req, res, next) => {
+    const status = err.status || 500;
+    const errors = err.errors || [];
+    let message = err.message;
+    if (status == 500) {
+        message = "Internal Server Error";
+    }
+
+    res.status(status).json({
+        success: false,
+        data: null,
+        message,
+        errors,
+    });
 });
 
 // Run the express.js application

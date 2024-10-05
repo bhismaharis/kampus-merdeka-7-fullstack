@@ -1,93 +1,119 @@
 [
-  {
-    "id": 1,
-    "name": "David Vincent Gurning",
-    "nickname": "David",
-    "class": "FSW-1",
-    "address": {
-      "province": "North Sumatera",
-      "city": "Medan"
+    {
+        "id": 1,
+        "name": "David Vincent Gurning",
+        "nickname": "David",
+        "class": "FSW-1",
+        "address": {
+            "province": "North Sumatera",
+            "city": "Medan"
+        },
+        "education": {
+            "bachelor": "Univeritas Teknologi Del"
+        }
     },
-    "education": {
-      "bachelor": "Univeritas Teknologi Del"
-    }
-  },
-  {
-    "id": 2,
-    "name": "Yudriqul Aulia",
-    "nickname": "Yudi",
-    "class": "FSW-1",
-    "address": {
-      "province": "Jambi",
-      "city": "Jambi"
+    {
+        "id": 2,
+        "name": "Yudriqul Aulia",
+        "nickname": "Yudi",
+        "class": "FSW-1",
+        "address": {
+            "province": "Jambi",
+            "city": "Jambi"
+        },
+        "education": {
+            "bachelor": "Univeritas Jambi"
+        }
     },
-    "education": {
-      "bachelor": "Univeritas Jambi"
-    }
-  },
-  {
-    "id": 3,
-    "name": "Iko Indra Gunawan",
-    "nickname": "Iko",
-    "class": "FSW-1",
-    "address": {
-      "province": "East Java",
-      "city": "Surabaya"
+    {
+        "id": 3,
+        "name": "Iko Indra Gunawan",
+        "nickname": "Iko",
+        "class": "FSW-1",
+        "address": {
+            "province": "East Java",
+            "city": "Surabaya"
+        },
+        "education": {
+            "bachelor": "UPN Veteran East Java"
+        }
     },
-    "education": {
-      "bachelor": "UPN Veteran East Java"
-    }
-  },
-  {
-    "id": 4,
-    "name": "Arswendo Erza Sadewa",
-    "nickname": "Erza",
-    "class": "FSW-1",
-    "address": {
-      "province": "Lampung",
-      "city": "lampung"
+    {
+        "id": 4,
+        "name": "Arswendo Erza Sadewa",
+        "nickname": "Erza",
+        "class": "FSW-1",
+        "address": {
+            "province": "Lampung",
+            "city": "lampung"
+        },
+        "education": {
+            "bachelor": "Universitas Lampung"
+        }
     },
-    "education": {
-      "bachelor": "Universitas Lampung"
-    }
-  },
-  {
-    "id": 5,
-    "name": "Dhiya Ul Faruq",
-    "nickname": "Faruq",
-    "class": "FSW-1",
-    "address": {
-      "province": "East Java",
-      "city": "Jember"
+    {
+        "id": 5,
+        "name": "Dhiya Ul Faruq",
+        "nickname": "Faruq",
+        "class": "FSW-1",
+        "address": {
+            "province": "East Java",
+            "city": "Jember"
+        },
+        "education": {
+            "bachelor": "Universitas Jember"
+        }
     },
-    "education": {
-      "bachelor": "Universitas Jember"
-    }
-  },
-  {
-    "id": 6,
-    "name": "Fariq Abdhe Manaf",
-    "nickname": "Fariq",
-    "class": "FSW-1",
-    "address": {
-      "province": "East Java",
-      "city": "Jember"
+    {
+        "id": 6,
+        "name": "Fariq Abdhe Manaf",
+        "nickname": "Fariq",
+        "class": "FSW-1",
+        "address": {
+            "province": "East Java",
+            "city": "Jember"
+        },
+        "education": {
+            "bachelor": "Universitas Jember"
+        }
     },
-    "education": {
-      "bachelor": "Universitas Jember"
-    }
-  },
-  {
-    "id": 7,
-    "name": "Bhisma Haris Alfitrah",
-    "nickname": "Bhisma",
-    "class": "FSW-1",
-    "address": {
-      "province": "East Java",
-      "city": "Jember"
+    {
+        "id": 7,
+        "name": "Bhisma Haris Alfitrah",
+        "nickname": "Bhisma",
+        "class": "FSW-1",
+        "address": {
+            "province": "East Java",
+            "city": "Jember"
+        },
+        "education": {
+            "bachelor": "Universitas Jember"
+        }
     },
-    "education": {
-      "bachelor": "Universitas Jember"
+    {
+        "id": 9,
+        "name": "Joe Ferdinan",
+        "nickname": "Joe",
+        "class": "FSW-1",
+        "address": {
+            "province": "East Java",
+            "city": "Jember"
+        },
+        "education": {
+            "bachelor": "Universitas Jember"
+        }
+    },
+    {
+        "id": 10,
+        "name": "Joe Ferdinan",
+        "nickname": "Joe",
+        "class": "FSW-1",
+        "address": {
+            "province": "East Java",
+            "city": "Jember"
+        },
+        "education": {
+            "bachelor": "Universitas Jember"
+        }
     }
-  }
 ]
