@@ -18,13 +18,26 @@ const successResponse = (res, data) => {
     });
 };
 
-const badRequestError = (errors) => {
-    throw new Error({
-        errors,
-        message: "Validation failed",
-        status: 400,
-    })
+class BadRequestError extends Error {
+    constructor(errors) {
+        super("Validation failed");
+        this.errors = errors;
+        this.status = 400;    
+    };
 };
+
+// handle the not found error class
+class NotFoundError extends Error {
+    constructor(message) {
+        if (message) {
+            super(message);
+        } else {
+            super("Data is not found");
+        }
+        this.status = 404;
+    };
+};
+
 
 // We need to activate body parser/reader
 app.use(express.json()); // Activate body reader
@@ -37,56 +50,55 @@ app.get("/", (req, res) => {
 
 app.get("/students", (req, res) => {
     // try {
-        // students?name=BAMARAMZY -> ramzy
-        // Validate the query
-        const validateQuery = z.object({
-            name: z.string().optional(),
-            nickname: z.string().optional(),
-            bachelor: z.string().optional(),
-        });
-    
-        const resultValidateQuery = validateQuery.safePars(req.params);
-        if (!resultValidateQuery.success) {
-            // If validation fails, return error messages
-            // return res.status(400).json({
-            //     message: "Validation failed",
-            //     errors: resultValidateQuery.error.errors.map((err) => ({
-            //         field: err.path[0],
-            //         issue: err.message,
-            //     })),
-            // });
-            badRequestError(resultValidateQuery.error.errors);
+    // students?name=BAMARAMZY -> ramzy
+    // Validate the query
+    const validateQuery = z.object({
+        name: z.string().optional(),
+        nickname: z.string().optional(),
+        bachelor: z.string().optional(),
+    });
+
+    const resultValidateQuery = validateQuery.safeParse(req.params);
+    if (!resultValidateQuery.success) {
+        // If validation fails, return error messages
+        // return res.status(400).json({
+        //     message: "Validation failed",
+        //     errors: resultValidateQuery.error.errors.map((err) => ({
+        //         field: err.path[0],
+        //         issue: err.message,
+        //     })),
+        // });
+        throw new BadRequestError(resultValidateQuery.error.errors.map);
+    }
+
+    const searchedStudent = students.filter((student) => {
+        // Do filter logic here
+        let result = true;
+        if (req.query.name) {
+            const isFoundName = student.name
+                .toLowerCase()
+                .includes(req.query.name.toLowerCase());
+            result = result && isFoundName;
         }
-    
-        const searchedStudent = students.filter((student) => {
-            // Do filter logic here
-            let result = true;
-            if (req.query.name) {
-                const isFoundName = student.name
-                    .toLowerCase()
-                    .includes(req.query.name.toLowerCase());
-                result = result && isFoundName;
-            }
-            if (req.query.nickname) {
-                const isFoundnickname = student.nickname
-                    .toLowerCase()
-                    .includes(req.query.nickname.toLowerCase());
-                result = result && isFoundnickname;
-            }
-            if (req.query.bachelor) {
-                const isFoundBachelor = student.education.bachelor
-                    .toLowerCase()
-                    .includes(req.query.bachelor.toLowerCase());
-                result = result && isFoundBachelor;
-            }
-    
-            return result;
-        });    
-        successResponse(res, searchedStudent);        
+        if (req.query.nickname) {
+            const isFoundnickname = student.nickname
+                .toLowerCase()
+                .includes(req.query.nickname.toLowerCase());
+            result = result && isFoundnickname;
+        }
+        if (req.query.bachelor) {
+            const isFoundBachelor = student.education.bachelor
+                .toLowerCase()
+                .includes(req.query.bachelor.toLowerCase());
+            result = result && isFoundBachelor;
+        }
+
+        return result;
+    });
+    successResponse(res, searchedStudent);
     // } catch (error) {
     //     next(error);
     // }
-        
 });
 
 app.get("/students/:id", (req, res) => {
@@ -98,13 +110,14 @@ app.get("/students/:id", (req, res) => {
     const result = validateParams.safeParse(req.params);
     if (!result.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: result.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        // return res.status(400).json({
+        //     message: "Validation failed",
+        //     errors: result.error.errors.map((err) => ({
+        //         field: err.path[0],
+        //         issue: err.message,
+        //     })),
+        // });
+        throw new BadRequestError(result.error.errors.map);
     }
 
     // Get the id from params
@@ -115,7 +128,8 @@ app.get("/students/:id", (req, res) => {
     if (!student) {
         // If there is no student with the id that client request, it will response not found
         // TODO: make a error class
-        return res.status(404).json({ message: "Student not found!" });
+        throw new NotFoundError("Student not found!");
+        // return res.status(404).json({ message: "Student not found!" });
     }
 
     // If student has been found, it will be response the student data
@@ -206,13 +220,14 @@ app.put("/students/:id", (req, res) => {
     const resultValidateParams = validateParams.safeParse(req.params);
     if (!resultValidateParams.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: resultValidateParams.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        // return res.status(400).json({
+        //     message: "Validation failed",
+        //     errors: resultValidateParams.error.errors.map((err) => ({
+        //         field: err.path[0],
+        //         issue: err.message,
+        //     })),
+        // });
+        throw new BadRequestError(resultValidateParams.error.errors.map);
     }
 
     // Validation body schema
@@ -236,23 +251,25 @@ app.put("/students/:id", (req, res) => {
     const resultValidateBody = validateBody.safeParse(req.body);
     if (!resultValidateBody.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: resultValidateBody.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        // return res.status(400).json({
+        //     message: "Validation failed",
+        //     errors: resultValidateBody.error.errors.map((err) => ({
+        //         field: err.path[0],
+        //         issue: err.message,
+        //     })),
+        // });
+        throw new BadRequestError(resultValidateBody.error.errors.map);
     }
 
     // Find the existing student data
     const id = Number(req.params.id);
     const student = students.find((student) => student.id === id);
     if (!student) {
-        // TODO: make a error class 
-        return res.status(404).json({
-            message: "Student not found!",
-        });
+        // TODO: make a error class
+        // return res.status(404).json({
+        //     message: "Student not found!",
+        // });
+        throw new NotFoundError("Student not found!");
     }
 
     // Update the data
@@ -278,13 +295,14 @@ app.delete("/students/:id", (req, res) => {
     const result = validateParams.safeParse(req.params);
     if (!result.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: result.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        // return res.status(400).json({
+        //     message: "Validation failed",
+        //     errors: result.error.errors.map((err) => ({
+        //         field: err.path[0],
+        //         issue: err.message,
+        //     })),
+        // });
+        throw new BadRequestError(result.error.errors.map);
     }
 
     // Get the id from params
@@ -296,7 +314,8 @@ app.delete("/students/:id", (req, res) => {
     // If the index found
     if (studentIndex < 0) {
         // If no index found
-        return res.status.json({ message: "Student not found!" });
+        // return res.status(404).json({ message: "Student not found!" });
+        throw new NotFoundError("Student not found!");
     }
 
     // If the index found
