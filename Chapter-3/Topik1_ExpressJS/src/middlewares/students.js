@@ -1,5 +1,5 @@
 const { z } = require("zod");
-const {BadRequestError} = require("../utils/request");
+const { BadRequestError } = require("../utils/request");
 
 exports.validateGetStudents = (req, res, next) => {
     const validateQuery = z.object({
@@ -24,16 +24,16 @@ exports.validateGetStudentById = (req, res, next) => {
     const resultValidateParams = validateParams.safeParse(req.params);
     if (!resultValidateParams.success) {
         throw new BadRequestError(resultValidateParams.error.errors);
-    }   
+    }
 
     next();
-}
+};
 
 exports.validateCreateStudent = (req, res, next) => {
     // Validation body schema
     const validateBody = z.object({
         name: z.string(),
-        nickName: z.string(),
+        nickname: z.string(),
         class: z.string(),
         address: z.object({
             province: z.string(),
@@ -72,7 +72,7 @@ exports.validateUpdateStudent = (req, res, next) => {
     // Validation body schema
     const validateBody = z.object({
         name: z.string(),
-        nickName: z.string(),
+        nickname: z.string(),
         class: z.string(),
         address: z.object({
             province: z.string(),

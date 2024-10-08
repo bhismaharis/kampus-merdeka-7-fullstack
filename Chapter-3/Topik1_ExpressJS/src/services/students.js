@@ -3,16 +3,20 @@ const { NotFoundError, InternalServerError } = require("../utils/request");
 
 exports.getStudents = (name, nickname, bachelor) => {
     return studentRepository.getStudents(name, nickname, bachelor);
-}
+};  
 
 exports.getStudentById = (id) => {
     const student = studentRepository.getStudentById(id);
-    if (student) {
+    if (!student) {
         throw new NotFoundError("Student is Not Found!");
     }
 
     return student;
-}
+};
+
+exports.createStudent = (data) => {
+    return studentRepository.createStudent(data);
+};
 
 exports.updateStudent = (id, data) => {
     // find student is exist or not (validate the data)

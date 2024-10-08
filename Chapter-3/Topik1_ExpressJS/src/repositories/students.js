@@ -1,4 +1,5 @@
 const students = require("../../data/students.json");
+const fs = require("fs");
 
 exports.getStudents = (name, nickname, bachelor) => {
     const searchedStudent = students.filter((student) => {

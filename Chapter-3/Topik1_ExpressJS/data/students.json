@@ -91,7 +91,7 @@
         }
     },
     {
-        "id": 9,
+        "id": 8,
         "name": "Joe Ferdinan",
         "nickname": "Joe",
         "class": "FSW-1",
@@ -100,20 +100,7 @@
             "city": "Jember"
         },
         "education": {
-            "bachelor": "Universitas Jember"
-        }
-    },
-    {
-        "id": 10,
-        "name": "Joe Ferdinan",
-        "nickname": "Joe",
-        "class": "FSW-1",
-        "address": {
-            "province": "East Java",
-            "city": "Jember"
-        },
-        "education": {
-            "bachelor": "Universitas Jember"
+            "bachelor": ""
         }
     }
 ]
