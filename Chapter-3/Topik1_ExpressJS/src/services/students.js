@@ -14,7 +14,13 @@ exports.getStudentById = (id) => {
     return student;
 };
 
-exports.createStudent = (data) => {
+exports.createStudent = async (data, file) => {
+    // Upload file ot image kit
+    if (file?.profilPicture) {
+        data.profilPicture = await imageUpload(file.profilPicture);
+    }
+
+    // Create the data
     return studentRepository.createStudent(data);
 };
 

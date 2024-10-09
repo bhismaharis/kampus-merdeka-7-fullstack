@@ -35,17 +35,24 @@ exports.validateCreateStudent = (req, res, next) => {
         name: z.string(),
         nickname: z.string(),
         class: z.string(),
-        address: z.object({
-            province: z.string(),
-            city: z.string(),
-        }),
-        education: z
-            .object({
-                bachelor: z.string().optional().nullable(),
-            })
-            .optional()
-            .nullable(),
+        "address.city": z.string(),
+        "address.province": z.string(),
+        "education.bachelor": z.string().optional().nullable(),
     });
+
+    // The file is not required.
+    const validateFileBody = z
+        .object({
+            profilePicture: z
+                .object({
+                    name: z.string(),
+                    data: z.any(),
+                })
+                .optional()
+                .nullable(),
+        })
+        .optional()
+        .nullable();
 
     // Validate
     const validateCreateStudent = validateBody.safeParse(req.body);
