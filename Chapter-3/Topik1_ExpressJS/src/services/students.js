@@ -25,11 +25,17 @@ exports.createStudent = async (data, file) => {
     return studentRepository.createStudent(data);
 };
 
-exports.updateStudent = (id, data) => {
+exports.updateStudent = async (id, data, file) => {
     // find student is exist or not (validate the data)
     const existingStudent = studentRepository.getStudentById(id);
     if (!existingStudent) {
         throw new NotFoundError("Student is Not Found!");
+    }
+    
+    if (file?.profilePicture) {
+        data.profilePicture = await imageUpload(file.profilePicture);
+    } else {
+        data.profilePicture = existingStudent.profilePicture;
     }
 
     // if exist, we will delete the student data
