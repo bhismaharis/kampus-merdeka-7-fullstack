@@ -102,5 +102,19 @@
         "education": {
             "bachelor": ""
         }
+    },
+    {
+        "id": 9,
+        "name": "Jetro Sulthan",
+        "nickname": "Jetro",
+        "class": "FSW-2",
+        "address": {
+            "city": "Jember",
+            "province": "East Java"
+        },
+        "education": {
+            "bachelor": "Universitas Jember"
+        },
+        "profilePicture": "https://ik.imagekit.io/7kqwhmhtfm/Screenshot_2024-10-10_175354_IDxH77KTJ.png"
     }
 ]

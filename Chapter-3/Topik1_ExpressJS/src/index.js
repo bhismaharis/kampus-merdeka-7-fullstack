@@ -8,7 +8,7 @@ const { errorHandler, notFoundURLHandler } = require("./middlewares/errors");
 
 // Make/instantiate express application
 const app = express(); // Create express app
-const port = 3000; // Define port
+const port = process.env.PORT || 3000; // Define port
 
 /* We need to activate body parser/reader */
 app.use(express.json());

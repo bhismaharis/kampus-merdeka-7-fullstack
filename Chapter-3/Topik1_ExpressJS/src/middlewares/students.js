@@ -68,6 +68,21 @@ exports.validateCreateStudent = (req, res, next) => {
         throw new BadRequestError(resultValidateFiles.error.errors);
     }
 
+    // Convert to student data format
+    req.body = {
+        ...req.body,
+        address: {
+            city: req.body["address.city"],
+            province: req.body["address.province"],
+        },
+        education: {
+            bachelor: req.body["education.bachelor"],
+        },
+    };
+    delete req.body["address.city"];
+    delete req.body["address.province"];
+    delete req.body["education.bachelor"];
+
     next();
 };
 
@@ -119,6 +134,20 @@ exports.validateUpdateStudent = (req, res, next) => {
         // If validation fails, return error messages
         throw new BadRequestError(resultValidateFiles.error.errors);
     }
+
+    req.body = {
+        ...req.body,
+        address: {
+            city: req.body["address.city"],
+            province: req.body["address.province"],
+        },
+        education: {
+            bachelor: req.body["education.bachelor"],
+        },
+    };
+    delete req.body["address.city"];
+    delete req.body["address.province"];
+    delete req.body["education.bachelor"];
 
     next();
 };

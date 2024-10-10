@@ -32,11 +32,18 @@ exports.updateStudent = async (id, data, file) => {
         throw new NotFoundError("Student is Not Found!");
     }
     
+    // Replace the existing data with the new data
+    data = {
+        ...existingStudent,
+        ...data,
+    };
+
     if (file?.profilePicture) {
         data.profilePicture = await imageUpload(file.profilePicture);
-    } else {
-        data.profilePicture = existingStudent.profilePicture;
-    }
+    } 
+    // else {
+    //     data.profilePicture = existingStudent.profilePicture;
+    // }
 
     // if exist, we will delete the student data
     const updatedStudent = studentRepository.updateStudent(id, data);
