@@ -1,4 +1,4 @@
-const ImageKit = require("imagekit-javascript");
+const ImageKit = require("imagekit");
 
 var imagekit = new ImageKit({
     publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
@@ -8,9 +8,9 @@ var imagekit = new ImageKit({
 
 // Image upload function to ImageKit
 exports.imageUpload = async (file) => {
-    const uploadFile = await imagekit.upload({
-        file: file.name,
-        fileName: file.data,
+    const uploadedFile = await imagekit.upload({
+        file: file.data,
+        fileName: file.name,
     });
-    return uploadFile?.url;
+    return uploadedFile?.url;
 };

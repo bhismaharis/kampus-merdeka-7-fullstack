@@ -1,3 +1,4 @@
+require("dotenv").config(); 
 const express = require("express"); 
 require("express-async-errors");
 const fileUpload = require("express-fileupload");
@@ -15,8 +16,8 @@ app.use(express.json());
 /* We need to read form-body (body parser/reader) if you want upload file */
 app.use(
     fileUpload({
-        useTempFiles: true,
-        tempFileDir: "/tmp/",
+        // useTempFiles: true,
+        // tempFileDir: "/tmp/",
         limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
     })
 );

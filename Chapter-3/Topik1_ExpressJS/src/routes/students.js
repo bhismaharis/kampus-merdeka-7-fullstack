@@ -16,10 +16,16 @@ const {
 
 const router = express.Router();
 
-router.get("/", validateGetStudents, getStudents);
-router.post("/", validateCreateStudent, createStudent);
-router.get("/:id", validateGetStudentById, getStudentById);
-router.put("/:id", validateUpdateStudent, updateStudent);
-router.delete("/:id", validateDeleteStudentById, deleteStudentById);
+// It will be run the URL based on path and the method
+router
+    .route("/")
+    .get(validateGetStudents, getStudents)
+    .post(validateCreateStudent, createStudent);
+
+router
+    .route("/:id")
+    .get(validateGetStudentById, getStudentById)
+    .put(validateUpdateStudent, updateStudent)
+    .delete(validateDeleteStudentById, deleteStudentById);
 
 module.exports = router;

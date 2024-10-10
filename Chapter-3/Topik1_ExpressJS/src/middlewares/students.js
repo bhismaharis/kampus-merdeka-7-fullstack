@@ -55,10 +55,17 @@ exports.validateCreateStudent = (req, res, next) => {
         .nullable();
 
     // Validate
-    const validateCreateStudent = validateBody.safeParse(req.body);
-    if (!validateCreateStudent.success) {
+    const result = validateBody.safeParse(req.body);
+    if (!result.success) {
         // If validation fails, return error messages
-        throw new BadRequestError(validateCreateStudent.error.errors);
+        throw new BadRequestError(result.error.errors);
+    }
+
+    // Validate
+    const resultValidateFiles = validateFileBody.safeParse(req.files);
+    if (!resultValidateFiles.success) {
+        // If validation fails, return error messages
+        throw new BadRequestError(resultValidateFiles.error.errors);
     }
 
     next();
@@ -73,7 +80,7 @@ exports.validateUpdateStudent = (req, res, next) => {
     const resultValidateParams = validateParams.safeParse(req.params);
     if (!resultValidateParams.success) {
         // If validation fails, return error messages
-        throw new BadRequestError(result.error.errors);
+        throw new BadRequestError(resultValidateParams.error.errors);
     }
 
     // Validation body schema
