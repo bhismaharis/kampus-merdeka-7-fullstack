@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             // "program": "${workspaceFolder}/Chapter-3/Topik1_ExpressJS/index.js",
-            "cwd": "${workspaceFolder}/Chapter-3/Topik1_ExpressJS",
+            "cwd": "${workspaceFolder}/Chapter-4/Database",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
