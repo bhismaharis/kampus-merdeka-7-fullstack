@@ -18,21 +18,23 @@ exports.getStudentById = async (req, res, next) => {
 };
 
 exports.createStudent = async (req, res, next) => {    
+    const {body, files} = req;
     // Create the new student
-    const data = await studentService.createStudent(req.body, req.files);
+    const data = await studentService.createStudent(body, files);
     successResponse(res, data);
 };
 
 exports.updateStudent = async (req, res, next) => {
     // Get the id from params
-    const { id } = req.params;    
-    const data = await studentService.updateStudent(id, req.body, req.files);
+    const { id } = req.params;   
+    const { body, files } = req; 
+    const data = await studentService.updateStudent(id, body, files);
     successResponse(res, data);
 };
 
-exports.deleteStudentById = (req, res, next) => {
+exports.deleteStudentById = async (req, res, next) => {
     // Get the id from params
     const { id } = req.params;
-    const data = studentService.deleteStudentById(id);
+    const data = await studentService.deleteStudentById(id);
     successResponse(res, data);
 };

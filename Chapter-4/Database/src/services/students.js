@@ -17,8 +17,8 @@ exports.getStudentById = async (id) => {
 
 exports.createStudent = async (data, file) => {
     // Upload file ot image kit
-    if (file?.profilePicture) {
-        data.profilePicture = await imageUpload(file.profilePicture);
+    if (file?.profile_picture) {
+        data.profile_picture = await imageUpload(file.profile_picture);
     }
 
     // Create the data
@@ -27,26 +27,17 @@ exports.createStudent = async (data, file) => {
 
 exports.updateStudent = async (id, data, file) => {
     // find student is exist or not (validate the data)
-    const existingStudent = studentRepository.getStudentById(id);
+    const existingStudent = await studentRepository.getStudentById(id);
     if (!existingStudent) {
         throw new NotFoundError("Student is Not Found!");
-    }
-    
-    // Replace the existing data with the new data
-    data = {
-        ...existingStudent,
-        ...data,
-    };
+    }    
 
-    if (file?.profilePicture) {
-        data.profilePicture = await imageUpload(file.profilePicture);
+    if (file?.profile_picture) {
+        data.profile_picture = await imageUpload(file.profile_picture);
     } 
-    // else {
-    //     data.profilePicture = existingStudent.profilePicture;
-    // }
 
     // if exist, we will delete the student data
-    const updatedStudent = studentRepository.updateStudent(id, data);
+    const updatedStudent = await studentRepository.updateStudent(id, data);
     if (!updatedStudent) {
         throw new InternalServerError(["Failed to update student!"]);
     }
@@ -54,15 +45,15 @@ exports.updateStudent = async (id, data, file) => {
     return updatedStudent;
 };
 
-exports.deleteStudentById = (id) => {
+exports.deleteStudentById = async (id) => {
     // find student is exist or not (validate the data)
-    const existingStudent = studentRepository.getStudentById(id);
+    const existingStudent = await studentRepository.getStudentById(id);
     if (!existingStudent) {
         throw new NotFoundError("Student is Not Found!");
     }
 
     // if exist, we will delete the student data
-    const deletedStudent = studentRepository.deleteStudentById(id);
+    const deletedStudent = await studentRepository.deleteStudentById(id);
     if (!deletedStudent) {
         throw new InternalServerError(["Failed to delete student!"]);
     }

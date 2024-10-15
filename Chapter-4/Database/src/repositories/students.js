@@ -1,7 +1,5 @@
-const fs = require("fs");
 const { PrismaClient } = require("@prisma/client");
 const JSONBigInt = require("json-bigint");
-const students = require("../../data/students.json");
 
 const prisma = new PrismaClient();
 
@@ -94,9 +92,41 @@ exports.getStudentById = async (id) => {
 };
 
 exports.createStudent = async (data) => {
+    // Find the student with the highest ID
+    const maxStudent = await prisma.students.findFirst({
+        orderBy: {
+            id: "desc",
+        },
+    });
+
+    const serializedMaxStudent = JSONBigInt.stringify(maxStudent);
+    const parsedMaxStudent = JSONBigInt.parse(serializedMaxStudent);
+
+    // Generate the new ID based on the maximum existing ID
+    const newId = parsedMaxStudent ? parsedMaxStudent.id + 1 : 1;
+
     const newStudent = await prisma.students.create({
         data: {
+            id: newId,
             ...data,
+        },
+        include: {
+            classes: {
+                select: {
+                    id: false,
+                    class: true,
+                    description: true,
+                },
+            },
+            universities: {
+                select: {
+                    id: false,
+                    name: true,
+                    description: true,
+                    city: true,
+                    country: true,
+                },
+            },
         },
     });
 
@@ -105,43 +135,47 @@ exports.createStudent = async (data) => {
     return JSONBigInt.parse(serializedStudents);
 };
 
-exports.updateStudent = (id, data) => {
-    // Find the existing student data
-    const student = students.find((student) => student.id === Number(id));
-    if (!student) {
-        // Make a error class
-        throw new NotFoundError("Student is Not Found!");
-    }
+exports.updateStudent = async (id, data) => {
+    const updatedStudent = await prisma.students.update({
+        where: {
+            id: id,
+        },
+        data: {
+            ...data,
+        },
+        include: {
+            classes: {
+                select: {
+                    id: false,
+                    class: true,
+                    description: true,
+                },
+            },
+            universities: {
+                select: {
+                    id: false,
+                    name: true,
+                    description: true,
+                    city: true,
+                    country: true,
+                },
+            },
+        },
+    });
 
-    // Update the data
-    Object.assign(student, data);
-
-    // Update the json data
-    fs.writeFileSync(
-        "./data/students.json",
-        JSON.stringify(students, null, 4),
-        "utf-8"
-    );
-
-    return student;
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(updatedStudent);
+    return JSONBigInt.parse(serializedStudents);
 };
 
-exports.deleteStudentById = (id) => {
-    // Find index
-    const studentIndex = students.findIndex((student) => student.id == id);
+exports.deleteStudentById = async (id) => {
+    const deletedStudent = await prisma.students.delete({
+        where: {
+            id: id,
+        },
+    });
 
-    if (studentIndex < 0) {
-        // If no index found
-        return null;
-    }
-
-    const deletedStudent = students.splice(studentIndex, 1);
-
-    // Update the json
-    fs.writeFileSync(
-        "./data/students.json",
-        JSON.stringify(students, null, 4),
-        "utf-8"
-    );
-    return deletedStudent;
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(deletedStudent);
+    return JSONBigInt.parse(serializedStudents);
 };

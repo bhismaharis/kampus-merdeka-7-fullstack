@@ -3,9 +3,9 @@ const { BadRequestError } = require("../utils/request");
 
 exports.validateGetStudents = (req, res, next) => {
     const validateQuery = z.object({
-        name: z.string().optional(),
-        nickname: z.string().optional(),
-        bachelor: z.string().optional(),
+        name: z.string().optional().nullable(),
+        nickname: z.string().optional().nullable(),
+        bachelor: z.string().optional().nullable(),
     });
 
     const resultValidateQuery = validateQuery.safeParse(req.query);
@@ -41,7 +41,7 @@ exports.validateCreateStudent = (req, res, next) => {
     // The file is not required.
     const validateFileBody = z
         .object({
-            profilePicture: z
+            profile_picture: z
                 .object({
                     name: z.string(),
                     data: z.any(),
@@ -65,7 +65,7 @@ exports.validateCreateStudent = (req, res, next) => {
         // If validation fails, return error messages
         throw new BadRequestError(resultValidateFiles.error.errors);
     }
-    
+
     next();
 };
 
@@ -84,16 +84,14 @@ exports.validateUpdateStudent = (req, res, next) => {
     // Validation body schema
     const validateBody = z.object({
         name: z.string(),
-        nickname: z.string(),
-        class: z.string(),
-        "address.city": z.string(),
-        "address.province": z.string(),
-        "education.bachelor": z.string().optional().nullable(),
+        nick_name: z.string(),
+        class_id: z.string(),
+        university_id: z.string(),
     });
 
     const validateFileBody = z
         .object({
-            profilePicture: z
+            profile_picture: z
                 .object({
                     name: z.string(),
                     data: z.any(),
@@ -117,20 +115,6 @@ exports.validateUpdateStudent = (req, res, next) => {
         // If validation fails, return error messages
         throw new BadRequestError(resultValidateFiles.error.errors);
     }
-
-    req.body = {
-        ...req.body,
-        address: {
-            city: req.body["address.city"],
-            province: req.body["address.province"],
-        },
-        education: {
-            bachelor: req.body["education.bachelor"],
-        },
-    };
-    delete req.body["address.city"];
-    delete req.body["address.province"];
-    delete req.body["education.bachelor"];
 
     next();
 };
