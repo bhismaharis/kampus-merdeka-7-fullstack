@@ -1,20 +1,19 @@
 const studentService = require("../services/students");
 const { successResponse } = require("../utils/response");
 
-exports.getStudents = (req, res, next) => {
+exports.getStudents = async (req, res, next) => {
     // Call the usecase or service
-    const data = studentService.getStudents(
+    const data = await studentService.getStudents(
         req.query?.name,
-        req.query?.nickname,
-        req.query?.bachelor
+        req.query?.nickname
     );
     successResponse(res, data);
 };
 
-exports.getStudentById = (req, res, next) => {
+exports.getStudentById = async (req, res, next) => {
     // Get the id from params
     const { id } = req.params;
-    const data = studentService.getStudentById(id);
+    const data = await studentService.getStudentById(id);
     successResponse(res, data);
 };
 

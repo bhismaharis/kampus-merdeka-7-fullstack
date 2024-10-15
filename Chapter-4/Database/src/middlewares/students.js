@@ -3,7 +3,7 @@ const { BadRequestError } = require("../utils/request");
 
 exports.validateGetStudents = (req, res, next) => {
     const validateQuery = z.object({
-        name: z.string(),
+        name: z.string().optional(),
         nickname: z.string().optional(),
         bachelor: z.string().optional(),
     });
@@ -33,11 +33,9 @@ exports.validateCreateStudent = (req, res, next) => {
     // Validation body schema
     const validateBody = z.object({
         name: z.string(),
-        nickname: z.string(),
-        class: z.string(),
-        "address.city": z.string(),
-        "address.province": z.string(),
-        "education.bachelor": z.string().optional().nullable(),
+        nick_name: z.string(),
+        class_id: z.string(),
+        university_id: z.string(),
     });
 
     // The file is not required.
@@ -67,22 +65,7 @@ exports.validateCreateStudent = (req, res, next) => {
         // If validation fails, return error messages
         throw new BadRequestError(resultValidateFiles.error.errors);
     }
-
-    // Convert to student data format
-    req.body = {
-        ...req.body,
-        address: {
-            city: req.body["address.city"],
-            province: req.body["address.province"],
-        },
-        education: {
-            bachelor: req.body["education.bachelor"],
-        },
-    };
-    delete req.body["address.city"];
-    delete req.body["address.province"];
-    delete req.body["education.bachelor"];
-
+    
     next();
 };
 

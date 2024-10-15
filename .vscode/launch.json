@@ -8,16 +8,21 @@
             "type": "node",
             "request": "launch",
             "name": "Chapter 3 - Express.js",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
+            // "program": "${workspaceFolder}/Chapter-3/Topik1_ExpressJS/index.js",
+            "cwd": "${workspaceFolder}/Chapter-3/Topik1_ExpressJS",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "dev"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Chapter 4 - Database",
+            "skipFiles": ["<node_internals>/**"],
             // "program": "${workspaceFolder}/Chapter-3/Topik1_ExpressJS/index.js",
             "cwd": "${workspaceFolder}/Chapter-4/Database",
             "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run-script",
-                "dev"
-            ]
+            "runtimeArgs": ["run-script", "dev"]
         }
     ]
 }

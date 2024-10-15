@@ -1,61 +1,108 @@
 const fs = require("fs");
+const { PrismaClient } = require("@prisma/client");
+const JSONBigInt = require("json-bigint");
 const students = require("../../data/students.json");
 
-exports.getStudents = (name, nickname, bachelor) => {
-    const searchedStudent = students.filter((student) => {
-        // Do filter logic here
-        let result = true;
-        if (name) {
-            const isFoundName = student.name
-                .toLowerCase()
-                .includes(name.toLowerCase());
-            result = result && isFoundName;
-        }
-        if (nickname) {
-            const isFoundnickname = student.nickname
-                .toLowerCase()
-                .includes(nickname.toLowerCase());
-            result = result && isFoundnickname;
-        }
-        if (bachelor) {
-            const isFoundBachelor = student.education.bachelor
-                .toLowerCase()
-                .includes(bachelor.toLowerCase());
-            result = result && isFoundBachelor;
-        }
-        return result;
-    });
-    return searchedStudent;
-};
+const prisma = new PrismaClient();
 
-exports.getStudentById = (id) => {
-    const student = students.find((student) => student.id == id);
-    return student;
-};
-
-exports.createStudent = (data) => {
-    // Find the max index to defnine the new data id
-    const maxId = students.reduce(
-        (max, student) => student.id > max && student.id,
-        0
-    );
-
-    const newStudent = {
-        id: maxId + 1,
-        ...data,
+exports.getStudents = async (name, nickname) => {
+    // Define the query
+    let query = {
+        // akan menghasilkan query
+        include: {
+            classes: {
+                select: {
+                    id: false,
+                    class: true,
+                    description: true,
+                },
+            },
+            universities: {
+                select: {
+                    id: false,
+                    name: true,
+                    description: true,
+                    city: true,
+                    country: true,
+                },
+            },
+        },
     };
 
-    /* Add data to current array students */
-    students.push(newStudent);
+    // it will generate the query
+    let orQuery = [];
+    if (name) {
+        orQuery.push({
+            name: {
+                contains: name,
+                mode: "insensitive",
+            },
+        });
+    }
+    if (nickname) {
+        orQuery.push({
+            nick_name: {
+                contains: nickname,
+                mode: "insensitive",
+            },
+        });
+    }
+    if (orQuery.length > 0) {
+        query.where = {
+            ...query.where,
+            OR: orQuery,
+        };
+    }
 
-    // Save the latest data to json
-    fs.writeFileSync(
-        "./data/students.json",
-        JSON.stringify(students, null, 4),
-        "utf-8"
-    );
+    // find the query
+    const searchedStudents = await prisma.students.findMany(query);
 
-    return newStudent;
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(searchedStudents);
+    return JSONBigInt.parse(serializedStudents);
+};
+
+exports.getStudentById = async (id) => {
+    // find student by id
+    const student = await prisma.students.findFirst({
+        where: {
+            id: id,
+        },
+        include: {
+            classes: {
+                select: {
+                    id: false,
+                    class: true,
+                    description: true,
+                },
+            },
+            universities: {
+                select: {
+                    id: false,
+                    name: true,
+                    description: true,
+                    city: true,
+                    country: true,
+                },
+            },
+        },
+    });
+
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(student);
+    return JSONBigInt.parse(serializedStudents);
+};
+
+exports.createStudent = async (data) => {
+    const newStudent = await prisma.students.create({
+        data: {
+            ...data,
+        },
+    });
+
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(newStudent);
+    return JSONBigInt.parse(serializedStudents);
 };
 
 exports.updateStudent = (id, data) => {
