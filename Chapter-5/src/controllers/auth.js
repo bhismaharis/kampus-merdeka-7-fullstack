@@ -10,3 +10,9 @@ exports.login = async (req, res, next) => {
     const data = await authServices.login(req.body);
     successResponse(res, data);
 };
+
+exports.getProfile = async (req, res, next) => {
+    const data = req.user;
+    delete data.password;
+    successResponse(res, data);
+};

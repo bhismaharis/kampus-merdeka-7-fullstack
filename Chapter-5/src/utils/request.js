@@ -25,8 +25,31 @@ class InternalServerError extends Error {
     }
 }
 
+class Unauthorized extends Error {
+    constructor(message) {
+        if (message) {
+            super(message);
+        } else {
+            super("Unauthorized!");
+        }
+        this.status = 401;
+    }
+}
+
+class Forbidden extends Error {
+    constructor(message) {
+        if (message) {
+            super(message);
+        } else {
+            super("Forbidden!");
+        }
+        this.status = 403;
+    }
+}
+
 module.exports = {
     BadRequestError,
     NotFoundError,
     InternalServerError,
+    Unauthorized,
 };

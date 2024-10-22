@@ -40,4 +40,5 @@ model users {
   email           String  @unique(map: "users_email_idx") @db.VarChar
   password        String  @db.VarChar
   profile_picture String? @db.VarChar
+  role_id         Int     @default(2)
 }

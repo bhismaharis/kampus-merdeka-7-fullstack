@@ -1,4 +1,5 @@
 const express = require("express");
+const { authorizations } = require("../middlewares/auth");
 const {
     validateGetStudents,
     validateGetStudentById,
@@ -19,13 +20,13 @@ const router = express.Router();
 // It will be run the URL based on path and the method
 router
     .route("/")
-    .get(validateGetStudents, getStudents)
-    .post(validateCreateStudent, createStudent);
+    .get(authorizations(1, 2), validateGetStudents, getStudents)
+    .post(authorizations(1), validateCreateStudent, createStudent);
 
 router
     .route("/:id")
-    .get(validateGetStudentById, getStudentById)
-    .put(validateUpdateStudent, updateStudent)
-    .delete(validateDeleteStudentById, deleteStudentById);
+    .get(authorizations(1, 2), validateGetStudentById, getStudentById)
+    .put(authorizations(1), validateUpdateStudent, updateStudent)
+    .delete(authorizations(1), validateDeleteStudentById, deleteStudentById);
 
 module.exports = router;

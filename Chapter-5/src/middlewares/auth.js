@@ -1,5 +1,41 @@
 const { z } = require("zod");
-const { BadRequestError } = require("../utils/request");
+const jwt = require("jsonwebtoken");
+const { BadRequestError, Unauthorized } = require("../utils/request");
+const usersRepository = require("../repositories/users");
+
+exports.authorizations =
+    (...roles) =>
+    async (req, res, next) => {
+        // get token from request header
+        const authorizationsHeader = req.header("authorization");
+        if (!authorizationsHeader) {
+            throw new Unauthorized("You need to login in advance!");
+        }
+
+        const splittedAuthHeader = authorizationsHeader.split(" ");
+        if (splittedAuthHeader.length <= 1) {
+            throw new Unauthorized("Token is not valid");
+        }
+
+        const token = splittedAuthHeader[1];
+
+        // extract user from token
+        const extractedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+        // get information of the user that has that token
+        const user = await usersRepository.getUserById(extractedToken.user_id);
+
+        // validate the role that can be access to the next middleware
+        const accessValidation = roles.includes(user.role_id);
+        if (!accessValidation) {
+            throw new Unauthorized("You can't access this resource");
+        }
+
+        // pass the user to request, then every middleware can access the user profile without needing to get again in repository level
+        req.user = user;
+
+        next();
+    };
 
 exports.validateRegister = (req, res, next) => {
     // Validate request body

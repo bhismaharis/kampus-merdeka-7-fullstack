@@ -2,13 +2,13 @@ const usersRepository = require("../repositories/users");
 const jwt = require("jsonwebtoken");
 const { imageUpload } = require("../utils/image-kit");
 const bcrypt = require("bcrypt");
-const { NotFoundError, InternalServerError } = require("../utils/request");
+const { Unauthorized } = require("../utils/request");
 
 exports.register = async (data, file) => {
     // handle while email already exist
     const userExist = await usersRepository.getUserByEmail(data.email);
     if (userExist) {
-        throw new InternalServerError(["Email already exist"]);
+        throw new Unauthorized(["Email already exist"]);
     }
 
     // if there are any file (profile picture)
@@ -20,12 +20,7 @@ exports.register = async (data, file) => {
     const user = await usersRepository.createUser(data);
 
     // generate token
-    const payload = {
-        id: user.id,
-    };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "3d", 
-    });
+    const token = createToken(user);
 
     // dont forget to remove the password object, if not removed it will be desplayed in the response
     delete user.password;
@@ -43,22 +38,17 @@ exports.login = async (data) => {
 
     // check if user exist
     if (!user) {
-        throw new NotFoundError("User not found");
+        throw new Unauthorized("User not found");
     }
 
     // check if password is correct
     const isMatch = await bcrypt.compare(data.password, user.password);
     if (!isMatch) {
-        throw new NotFoundError("Invalid credentials");
+        throw new Unauthorized("Invalid credentials");
     }
     
     // generate token
-    const payload = {
-        id: user.id,
-    };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "3d",
-    });
+    const token = createToken(user);
 
     // dont forget to remove the password object, if not removed it will be desplayed in the response
     delete user.password;
@@ -68,4 +58,16 @@ exports.login = async (data) => {
         user,
         token,
     };
+};
+
+const createToken = (user) => {
+    // generate token with jwt
+    const payload = {
+        user_id: user.id,
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "72h", // expired in 3 days
+    });
+
+    return token;
 };
