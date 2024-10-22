@@ -23,6 +23,16 @@
             "cwd": "${workspaceFolder}/Chapter-4/Database",
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run-script", "dev"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Chapter 5 - Auth",
+            "skipFiles": ["<node_internals>/**"],
+            // "program": "${workspaceFolder}/Chapter-3/Topik1_ExpressJS/index.js",
+            "cwd": "${workspaceFolder}/Chapter-5",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "dev"]
         }
     ]
 }

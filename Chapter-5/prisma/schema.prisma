@@ -33,3 +33,11 @@ model universities {
   country     String     @db.VarChar(255)
   students    students[]
 }
+
+model users {
+  id              BigInt  @id(map: "users_pk") @default(autoincrement())
+  name            String  @db.VarChar
+  email           String  @unique(map: "users_email_idx") @db.VarChar
+  password        String  @db.VarChar
+  profile_picture String? @db.VarChar
+}
