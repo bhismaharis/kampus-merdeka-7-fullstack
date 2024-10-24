@@ -31,8 +31,10 @@ export const Route = createRootRoute({
                 </Container>
             </Navbar>
 
-            {/* Outlet is to detect  the pathname or url and then render the component by pathname or url*/}
-            <Outlet />
+            <Container>
+                {/* Outlet is to detect  the pathname or url and then render the component by pathname or url*/}
+                <Outlet />
+            </Container>
 
             {/* TanStackRouterDevtools is for debugging router */}
             <TanStackRouterDevtools />
