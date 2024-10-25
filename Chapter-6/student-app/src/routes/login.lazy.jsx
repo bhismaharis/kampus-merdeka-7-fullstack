@@ -1,13 +1,19 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
+import { useState } from "react";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
 });
 
 function Login() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
     return (
         <Row className="mt-5">
+            <h1>{email}</h1>
+            <h1>{password}</h1>
             <Col className="offset-md-3">
                 <Card className="text-center">
                     <Card.Header>Login</Card.Header>
@@ -26,6 +32,10 @@ function Login() {
                                         type="email"
                                         placeholder="Email"
                                         required
+                                        value={email}
+                                        onChange={(e) => {
+                                            setEmail(e.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
@@ -43,6 +53,10 @@ function Login() {
                                         type="password"
                                         placeholder="Password"
                                         required
+                                        value={password}
+                                        onChange={(e) => {
+                                            setPassword(e.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
