@@ -6,13 +6,42 @@ export const Route = createLazyFileRoute("/register")({
 });
 
 function Register() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [profilePicture, setProfilePicture] = useState(undefined);
+    const onSubmit = async (event) => {
+        event.preventDefault();
+        if (password != confirmPassword) {
+            alert("Password and password confirmation must be same!");
+        }
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("profile_picture", profilePicture);
+        const response = await fetch("http://localhost:4000/auth/register", {
+            method: "POST",
+            body: formData,
+        });
+        // get the data if fetching succeed!
+        const result = await response.json();
+        if (result.success) {
+            // save token to local storage
+            localStorage.setItem("token", result.data.token);
+            return;
+        }
+        alert(result.message);
+    };
+
     return (
         <Row className="mt-5">
             <Col className="offset-md-3">
                 <Card className="text-center">
                     <Card.Header>Register</Card.Header>
                     <Card.Body>
-                        <Form>
+                        <Form onSubmit={onSubmit}>
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
@@ -26,6 +55,10 @@ function Register() {
                                         type="text"
                                         placeholder="Name"
                                         required
+                                        value={name}
+                                        onChange={(e) => {
+                                            setName(e.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
@@ -43,6 +76,10 @@ function Register() {
                                         type="email"
                                         placeholder="Email"
                                         required
+                                        value={email}
+                                        onChange={(e) => {
+                                            setEmail(e.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
@@ -60,10 +97,14 @@ function Register() {
                                         type="password"
                                         placeholder="Password"
                                         required
+                                        value={password}
+                                        onChange={(e) => {
+                                            setPassword(e.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
-                            
+
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
@@ -77,10 +118,14 @@ function Register() {
                                         type="password"
                                         placeholder="Confirm Password"
                                         required
+                                        value={confirmPassword}
+                                        onChange={(e) => {
+                                            setConfirmPassword(e.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
-                            
+
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
@@ -92,14 +137,22 @@ function Register() {
                                 <Col sm="9">
                                     <Form.Control
                                         type="file"
-                                        placeholder="Profile Picture"
+                                        placeholder="Choose File"
+                                        required
+                                        onChange={(e) => {
+                                            setProfilePicture(
+                                                e.target.files[0]
+                                            );
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
+                            <div className="d-grid gap-2">
+                                <Button type="submit" variant="primary">
+                                    Register
+                                </Button>
+                            </div>
                         </Form>
-                        <div className="d-grid gap-2">
-                            <Button variant="primary">Register</Button>
-                        </div>
                     </Card.Body>
                 </Card>
             </Col>

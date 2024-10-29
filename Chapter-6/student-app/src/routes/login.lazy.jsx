@@ -10,15 +10,42 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const onSubmit = async (event) => {
+        event.preventDefault();
+
+        /* hit the login API */
+        // define the request body
+        const body = {
+            email,
+            password,
+        };
+
+        // hit the login API with the data
+        const response = await fetch("http://localhost:3000/auth/login", {
+            body: JSON.stringify(body),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        // get the data if fetcing id successful
+        const result = await response.json();
+        if (result.success) {
+            // save the token in local storage
+            localStorage.setItem("token", result.data.token);
+            return;
+        }
+        alert(result.message);
+    };
+
     return (
         <Row className="mt-5">
-            <h1>{email}</h1>
-            <h1>{password}</h1>
             <Col className="offset-md-3">
                 <Card className="text-center">
                     <Card.Header>Login</Card.Header>
                     <Card.Body>
-                        <Form>
+                        <Form onSubmit={onSubmit}>
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
@@ -60,10 +87,12 @@ function Login() {
                                     />
                                 </Col>
                             </Form.Group>
+                            <div className="d-grid gap-2">
+                                <Button type="submit" variant="primary">
+                                    Login
+                                </Button>
+                            </div>
                         </Form>
-                        <div className="d-grid gap-2">
-                            <Button variant="primary">Login</Button>
-                        </div>
                     </Card.Body>
                 </Card>
             </Col>
