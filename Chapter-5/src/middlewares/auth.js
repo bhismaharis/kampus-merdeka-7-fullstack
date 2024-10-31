@@ -20,7 +20,12 @@ exports.authorizations =
         const token = splittedAuthHeader[1];
 
         // extract user from token
-        const extractedToken = jwt.verify(token, process.env.JWT_SECRET);
+        let extractedToken;
+        try {
+            extractedToken = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            throw new Unauthorized("Token is not valid");
+        }
 
         // get information of the user that has that token
         const user = await usersRepository.getUserById(extractedToken.user_id);

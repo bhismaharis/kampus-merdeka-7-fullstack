@@ -9,8 +9,11 @@ const NavigationBar = () => {
         // get the token from local storage
         const token = localStorage.getItem("token");
 
-        // hit api auth get profile and pass the token  to the function
-        getProfile(token);
+        if (token) {
+            // hit api auth get profile and pass the token  to the function
+            getProfile(token);
+        }
+
     }, []);
 
     const getProfile = async (token) => {

@@ -4,11 +4,15 @@ require("express-async-errors");
 const fileUpload = require("express-fileupload");
 const router = require("./routes"); 
 const { errorHandler, notFoundURLHandler } = require("./middlewares/errors");
+const cors = require("cors");
 
 
 // Make/instantiate express application
 const app = express(); // Create express app
 const port = process.env.PORT || 3000; // Define port
+
+//enebla cors
+app.use(cors());
 
 /* We need to activate body parser/reader */
 app.use(express.json());

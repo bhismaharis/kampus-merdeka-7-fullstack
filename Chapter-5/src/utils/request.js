@@ -52,4 +52,5 @@ module.exports = {
     NotFoundError,
     InternalServerError,
     Unauthorized,
+    Forbidden,
 };

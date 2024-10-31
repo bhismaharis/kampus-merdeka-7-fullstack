@@ -33,6 +33,22 @@
             "cwd": "${workspaceFolder}/Chapter-5",
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run-script", "dev"]
+        },
+        {
+            "name": "Chapter 6 - Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/Chapter-6/student-app"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Chapter 6 - React.js",
+            "skipFiles": ["<node_internals>/**"],
+            "cwd": "${workspaceFolder}/Chapter-6/student-app",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"] // Corrected this line
         }
     ]
 }
