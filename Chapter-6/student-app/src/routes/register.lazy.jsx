@@ -1,5 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
+import { useEffect, useState } from "react";
 
 export const Route = createLazyFileRoute("/register")({
     component: Register,
@@ -11,25 +12,45 @@ function Register() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
+
+    useEffect(() => { 
+        // get token from local storage
+        const token = localStorage.getItem("token");
+        if (token) {
+            window.location.href = "/";
+        }
+    }, []);
+
     const onSubmit = async (event) => {
         event.preventDefault();
+        
         if (password != confirmPassword) {
             alert("Password and password confirmation must be same!");
         }
+
         const formData = new FormData();
         formData.append("name", name);
         formData.append("email", email);
         formData.append("password", password);
         formData.append("profile_picture", profilePicture);
-        const response = await fetch("http://localhost:4000/auth/register", {
-            method: "POST",
-            body: formData,
-        });
+
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/auth/register`,
+            {
+                method: "POST",
+                body: formData,
+            }
+        );
+
         // get the data if fetching succeed!
         const result = await response.json();
         if (result.success) {
             // save token to local storage
             localStorage.setItem("token", result.data.token);
+
+            // redirect to home page
+            window.location.href = "/";
+
             return;
         }
         alert(result.message);

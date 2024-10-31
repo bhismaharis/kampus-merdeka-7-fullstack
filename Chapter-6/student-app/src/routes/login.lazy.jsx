@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
@@ -9,6 +9,14 @@ export const Route = createLazyFileRoute("/login")({
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    useEffect(() => {
+        // get token from local storage
+        const token = localStorage.getItem("token");
+        if (token) {
+            window.location.href = "/";
+        }
+    }, []);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -21,19 +29,26 @@ function Login() {
         };
 
         // hit the login API with the data
-        const response = await fetch("http://localhost:3000/auth/login", {
-            body: JSON.stringify(body),
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/auth/login`,
+            {
+                body: JSON.stringify(body),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
         // get the data if fetcing id successful
         const result = await response.json();
         if (result.success) {
             // save the token in local storage
             localStorage.setItem("token", result.data.token);
+
+            // redirect to home page
+            window.location.href = "/";
+
             return;
         }
         alert(result.message);
