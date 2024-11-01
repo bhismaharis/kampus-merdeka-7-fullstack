@@ -1,12 +1,17 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
-import { Button, Card, Col, Form, Row } from "react-bootstrap";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Button, Card, Col, Form, Row } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { setToken } from "../redux/slices/auth";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
 });
 
 function Login() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -14,7 +19,7 @@ function Login() {
         // get token from local storage
         const token = localStorage.getItem("token");
         if (token) {
-            window.location.href = "/";
+            window.location = "/";
         }
     }, []);
 
@@ -40,64 +45,63 @@ function Login() {
             }
         );
 
-        // get the data if fetcing id successful
+        // get the data if fetching succeed!
         const result = await response.json();
         if (result.success) {
-            // save the token in local storage
-            localStorage.setItem("token", result.data.token);
+            // set token to global state
+            dispatch(setToken(result.data.token));
 
-            // redirect to home page
-            window.location.href = "/";
-
+            // redirect to home
+            navigate({ to: "/" });
             return;
         }
+
         alert(result.message);
     };
 
     return (
         <Row className="mt-5">
             <Col className="offset-md-3">
-                <Card className="text-center">
-                    <Card.Header>Login</Card.Header>
+                <Card>
+                    <Card.Header className="text-center">Login</Card.Header>
                     <Card.Body>
                         <Form onSubmit={onSubmit}>
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
-                                controlId="formPlaintextEmail"
+                                controlId="email"
                             >
-                                <Form.Label column sm="2">
+                                <Form.Label column sm={3}>
                                     Email
                                 </Form.Label>
-                                <Col sm="10">
+                                <Col sm="9">
                                     <Form.Control
                                         type="email"
                                         placeholder="Email"
                                         required
                                         value={email}
-                                        onChange={(e) => {
-                                            setEmail(e.target.value);
+                                        onChange={(event) => {
+                                            setEmail(event.target.value);
                                         }}
                                     />
                                 </Col>
                             </Form.Group>
-
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
-                                controlId="formPlaintextPassword"
+                                controlId="password"
                             >
-                                <Form.Label column sm="2">
+                                <Form.Label column sm={3}>
                                     Password
                                 </Form.Label>
-                                <Col sm="10">
+                                <Col sm="9">
                                     <Form.Control
                                         type="password"
                                         placeholder="Password"
                                         required
                                         value={password}
-                                        onChange={(e) => {
-                                            setPassword(e.target.value);
+                                        onChange={(event) => {
+                                            setPassword(event.target.value);
                                         }}
                                     />
                                 </Col>
