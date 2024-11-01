@@ -2,7 +2,7 @@ import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import { register } from "../api/auth";
+import { register } from "../service/auth";
 
 
 export const Route = createLazyFileRoute("/register")({
