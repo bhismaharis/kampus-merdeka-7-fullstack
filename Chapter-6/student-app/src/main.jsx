@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { store } from './redux/store'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -15,7 +17,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
+      <Provider store={store}>
       <RouterProvider router={router} />
+      </Provider>
     </StrictMode>,
   )
 }
