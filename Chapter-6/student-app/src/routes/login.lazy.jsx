@@ -1,8 +1,9 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setToken } from "../redux/slices/auth";
+import { login } from "../service/auth";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
@@ -12,16 +13,17 @@ function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const { token } = useSelector((state) => state.auth);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     useEffect(() => {
         // get token from local storage
-        const token = localStorage.getItem("token");
         if (token) {
-            window.location = "/";
+            navigate({ to: "/" });
         }
-    }, []);
+    }, [navigate, token]);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -34,19 +36,7 @@ function Login() {
         };
 
         // hit the login API with the data
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/auth/login`,
-            {
-                body: JSON.stringify(body),
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-
-        // get the data if fetching succeed!
-        const result = await response.json();
+        const result = await login(body);
         if (result.success) {
             // set token to global state
             dispatch(setToken(result.data.token));

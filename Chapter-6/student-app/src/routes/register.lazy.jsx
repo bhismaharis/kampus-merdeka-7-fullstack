@@ -1,16 +1,18 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
-import { useDispatch } from "react-redux";
-import { setToken } from "../redux/slices/auth";
+import { useSelector } from "react-redux";
+import { register } from "../api/auth";
+
 
 export const Route = createLazyFileRoute("/register")({
     component: Register,
 });
 
 function Register() {
-    const dispatch = useDispatch();
     const navigate = useNavigate(); 
+
+    const { token } = useSelector((state) => state.auth);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -20,11 +22,10 @@ function Register() {
 
     useEffect(() => {
         // get token from local storage
-        const token = localStorage.getItem("token");
         if (token) {
-            window.location = "/";
+            navigate({ to: "/" });
         }
-    }, []);
+    }, [token, navigate]);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -33,28 +34,23 @@ function Register() {
             alert("Password and password confirmation must be same!");
         }
 
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("profile_picture", profilePicture);
-
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/auth/register`,
-            {
-                method: "POST",
-                body: formData,
-            }
-        );
+        // hit the register API
+        const request = {
+            name,
+            email,
+            password,
+            profilePicture,
+        };
 
         // get the data if fetching succeed!
-        const result = await response.json();
+        const result = await register(request);
         if (result.success) {
-            // set token to global state
-            dispatch(setToken(result.data.token));
+            // save token to local storage
+            localStorage.setItem("token", result.data.token);
 
             // redirect to home
-            navigate({ to: "/" });
+            window.location = "/";
+
             return;
         }
 
