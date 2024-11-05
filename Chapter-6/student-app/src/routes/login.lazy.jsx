@@ -4,6 +4,7 @@ import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken } from "../redux/slices/auth";
 import { login } from "../service/auth";
+import { toast } from "react-toastify";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
@@ -46,7 +47,7 @@ function Login() {
             return;
         }
 
-        alert(result.message);
+        toast.error(result?.message);
     };
 
     return (

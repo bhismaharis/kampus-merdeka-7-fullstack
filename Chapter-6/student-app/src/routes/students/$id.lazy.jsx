@@ -1,8 +1,9 @@
-import { createLazyFileRoute, Link, useNavigate} from "@tanstack/react-router";
+import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Row, Col, Card, Button } from "react-bootstrap";
 import { getDetailStudent } from "../../service/student";
 import { deleteStudent } from "../../service/student";
+import { toast } from "react-toastify";
 
 export const Route = createLazyFileRoute("/students/$id")({
     component: StudentDetail,
@@ -64,7 +65,7 @@ function StudentDetail() {
                 return;
             }
 
-            alert(result?.message);
+            toast.error(result?.message);
         }
     };
 

@@ -5,6 +5,7 @@ import { getUniversities } from "../../../service/university";
 import { getClasses } from "../../../service/class";
 import { getDetailStudent } from "../../../service/student";
 import { updateStudent } from "../../../service/student";
+import { toast } from "react-toastify";
 
 export const Route = createLazyFileRoute("/students/edit/$id")({
     component: EditStudent,
@@ -86,7 +87,7 @@ function EditStudent() {
             return;
         }
 
-        alert(result?.message);
+        toast.error(result?.message);
     };
 
     return (
