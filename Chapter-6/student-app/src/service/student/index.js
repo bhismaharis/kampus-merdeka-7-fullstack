@@ -93,3 +93,21 @@ export const updateStudent = async (id, request) => {
     const result = await response.json();
     return result;
 }
+
+export const deleteStudent = async (id) => {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/students/${id}`,
+        {
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+            method: "DELETE",
+        }
+    );
+
+    // get the data if fetching succeed!
+    const result = await response.json();
+    return result;
+};

@@ -1,7 +1,8 @@
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { createLazyFileRoute, Link, useNavigate} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Row, Col, Card, Button } from "react-bootstrap";
 import { getDetailStudent } from "../../service/student";
+import { deleteStudent } from "../../service/student";
 
 export const Route = createLazyFileRoute("/students/$id")({
     component: StudentDetail,
@@ -9,6 +10,7 @@ export const Route = createLazyFileRoute("/students/$id")({
 
 function StudentDetail() {
     const { id } = Route.useParams();
+    const navigate = useNavigate();
 
     const [student, setStudent] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +54,20 @@ function StudentDetail() {
         );
     }
 
+    const onDelete = async (event) => {
+        event.preventDefault();
+
+        if (confirm("Are you sure to delete this student?")) {
+            const result = await deleteStudent(id);
+            if (result?.success) {
+                navigate({ to: "/" });
+                return;
+            }
+
+            alert(result?.message);
+        }
+    };
+
     return (
         <Row className="mt-5">
             <Col className="offset-md-3">
@@ -62,16 +78,29 @@ function StudentDetail() {
                         <Card.Text>{student?.nick_name}</Card.Text>
                         <Card.Text>{student?.classes?.class}</Card.Text>
                         <Card.Text>{student?.universities?.name}</Card.Text>
-                        <div className="d-grid gap-2">
-                            <Button
-                                as={Link}
-                                href={`/students/edit/${id}`}
-                                variant="primary"
-                                size="lg"
-                            >
-                                Edit Student
-                            </Button>
-                        </div>
+                        <Card.Text>
+                            <div className="d-grid gap-2">
+                                <Button
+                                    as={Link}
+                                    href={`/students/edit/${id}`}
+                                    variant="primary"
+                                    size="md"
+                                >
+                                    Edit Student
+                                </Button>
+                            </div>
+                        </Card.Text>
+                        <Card.Text>
+                            <div className="d-grid gap-2">
+                                <Button
+                                    onClick={onDelete}
+                                    variant="danger"
+                                    size="md"
+                                >
+                                    Delete Student
+                                </Button>
+                            </div>
+                        </Card.Text>
                     </Card.Body>
                 </Card>
             </Col>
