@@ -14,19 +14,20 @@ const {
     createStudent,
     updateStudent,
 } = require("../controllers/students");
+const { adminRole, userRole } = require("../constants/auth");
 
 const router = express.Router();
 
 // It will be run the URL based on path and the method
 router
     .route("/")
-    .get(authorizations(1, 2), validateGetStudents, getStudents)
-    .post(authorizations(1), validateCreateStudent, createStudent);
+    .get(authorizations(adminRole, userRole), validateGetStudents, getStudents)
+    .post(authorizations(adminRole), validateCreateStudent, createStudent);
 
 router
     .route("/:id")
-    .get(authorizations(1, 2), validateGetStudentById, getStudentById)
-    .put(authorizations(1), validateUpdateStudent, updateStudent)
-    .delete(authorizations(1), validateDeleteStudentById, deleteStudentById);
+    .get(authorizations(adminRole, userRole), validateGetStudentById, getStudentById)
+    .put(authorizations(adminRole), validateUpdateStudent, updateStudent)
+    .delete(authorizations(adminRole), validateDeleteStudentById, deleteStudentById);
 
 module.exports = router;
