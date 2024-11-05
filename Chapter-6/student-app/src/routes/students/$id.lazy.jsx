@@ -1,6 +1,6 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Button } from "react-bootstrap";
 import { getDetailStudent } from "../../service/student";
 
 export const Route = createLazyFileRoute("/students/$id")({
@@ -62,6 +62,16 @@ function StudentDetail() {
                         <Card.Text>{student?.nick_name}</Card.Text>
                         <Card.Text>{student?.classes?.class}</Card.Text>
                         <Card.Text>{student?.universities?.name}</Card.Text>
+                        <div className="d-grid gap-2">
+                            <Button
+                                as={Link}
+                                href={`/students/edit/${id}`}
+                                variant="primary"
+                                size="lg"
+                            >
+                                Edit Student
+                            </Button>
+                        </div>
                     </Card.Body>
                 </Card>
             </Col>

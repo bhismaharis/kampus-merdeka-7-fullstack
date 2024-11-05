@@ -41,42 +41,55 @@ export const getDetailStudent = async (id) => {
     return result;
 };
 
-export const createStudent = async (student) => {
+export const createStudent = async (request) => {
     const token = localStorage.getItem("token");
 
-    const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/students`,
-        {
-            headers: {
-                authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify(student),
-        }
-    );
+    const formData = new FormData();
+    formData.append("name", request.name);
+    formData.append("nick_name", request.nickName);
+    formData.append("class_id", request.classId);
+    formData.append("university_id", request.universityId);
+    if (request.profilePicture) {
+        formData.append("profile_picture", request.profilePicture);
+    }
 
-    // get data
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/students`, {
+        body: formData,
+        headers: {
+            authorization: `Bearer ${token}`,
+        },
+        method: "POST",
+    });
+
+    // get the data if fetching succeed!
     const result = await response.json();
     return result;
 };
 
-export const updateStudent = async (id, student) => {
+export const updateStudent = async (id, request) => {
     const token = localStorage.getItem("token");
+
+    const formData = new FormData();
+    formData.append("name", request.name);
+    formData.append("nick_name", request.nickName);
+    formData.append("class_id", request.classId);
+    formData.append("university_id", request.universityId);
+    if (request.profilePicture) {
+        formData.append("profile_picture", request.profilePicture);
+    }
 
     const response = await fetch(
         `${import.meta.env.VITE_API_URL}/students/${id}`,
         {
+            body: formData,
             headers: {
                 authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
             },
             method: "PUT",
-            body: JSON.stringify(student),
         }
     );
 
-    // get data
+    // get the data if fetching succeed!
     const result = await response.json();
     return result;
-};
+}

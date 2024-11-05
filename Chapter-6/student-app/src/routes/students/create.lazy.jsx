@@ -1,18 +1,22 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Row, Col, Card, Form, Button, Image } from "react-bootstrap";
+import { Button, Card, Col, Form, Image, Row } from "react-bootstrap";
 import { getUniversities } from "../../service/university";
 import { getClasses } from "../../service/class";
+import { createStudent } from "../../service/student";
 
 export const Route = createLazyFileRoute("/students/create")({
     component: CreateStudent,
 });
 
 function CreateStudent() {
+    const navigate = useNavigate();
+
     const [name, setName] = useState("");
     const [nickName, setNickName] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
-    const [currentProfilePicture, setCurrentProfilePicture] = useState(undefined);
+    const [currentProfilePicture, setCurrentProfilePicture] =
+        useState(undefined);
     const [universities, setUniversities] = useState([]);
     const [universityId, setUniversityId] = useState(0);
     const [classes, setClasses] = useState([]);
@@ -36,8 +40,23 @@ function CreateStudent() {
         getClassesData();
     }, []);
 
-    const onSubmit = (event) => {
+    const onSubmit = async (event) => {
         event.preventDefault();
+
+        const request = {
+            name,
+            nickName,
+            classId,
+            universityId,
+            profilePicture,
+        };
+        const result = await createStudent(request);
+        if (result?.success) {
+            navigate({ to: "/" });
+            return;
+        }
+
+        alert(result?.message);
     };
 
     return (
@@ -98,7 +117,12 @@ function CreateStudent() {
                                     University
                                 </Form.Label>
                                 <Col sm="9">
-                                    <Form.Select aria-label="Default select example">
+                                    <Form.Select
+                                        aria-label="Default select example"
+                                        onChange={(event) => {
+                                            setUniversityId(event.target.value);
+                                        }}
+                                    >
                                         <option disabled selected>
                                             Select University
                                         </option>
@@ -123,7 +147,12 @@ function CreateStudent() {
                                     Class
                                 </Form.Label>
                                 <Col sm="9">
-                                    <Form.Select aria-label="Default select example">
+                                    <Form.Select
+                                        aria-label="Default select example"
+                                        onChange={(event) => {
+                                            setClassId(event.target.value);
+                                        }}
+                                    >
                                         <option disabled selected>
                                             Select Class
                                         </option>
