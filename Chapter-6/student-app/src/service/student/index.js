@@ -40,3 +40,43 @@ export const getDetailStudent = async (id) => {
     const result = await response.json();
     return result;
 };
+
+export const createStudent = async (student) => {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/students`,
+        {
+            headers: {
+                authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify(student),
+        }
+    );
+
+    // get data
+    const result = await response.json();
+    return result;
+};
+
+export const updateStudent = async (id, student) => {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/students/${id}`,
+        {
+            headers: {
+                authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            method: "PUT",
+            body: JSON.stringify(student),
+        }
+    );
+
+    // get data
+    const result = await response.json();
+    return result;
+};
