@@ -6,9 +6,14 @@ import { getClasses } from "../../../service/class";
 import { getDetailStudent } from "../../../service/student";
 import { updateStudent } from "../../../service/student";
 import { toast } from "react-toastify";
+import Protected from "../../../components/Auth/Protected";
 
 export const Route = createLazyFileRoute("/students/edit/$id")({
-    component: EditStudent,
+    component: () => (
+        <Protected>
+            <EditStudent />
+        </Protected>
+    )
 });
 
 function EditStudent() {

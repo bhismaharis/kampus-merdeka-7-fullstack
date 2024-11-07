@@ -4,6 +4,7 @@ import { Row, Col, Card, Button } from "react-bootstrap";
 import { getDetailStudent } from "../../service/student";
 import { deleteStudent } from "../../service/student";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 export const Route = createLazyFileRoute("/students/$id")({
     component: StudentDetail,
@@ -12,6 +13,8 @@ export const Route = createLazyFileRoute("/students/$id")({
 function StudentDetail() {
     const { id } = Route.useParams();
     const navigate = useNavigate();
+
+    const { user } = useSelector((state) => state.auth);
 
     const [student, setStudent] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -79,29 +82,34 @@ function StudentDetail() {
                         <Card.Text>{student?.nick_name}</Card.Text>
                         <Card.Text>{student?.classes?.class}</Card.Text>
                         <Card.Text>{student?.universities?.name}</Card.Text>
-                        <Card.Text>
-                            <div className="d-grid gap-2">
-                                <Button
-                                    as={Link}
-                                    href={`/students/edit/${id}`}
-                                    variant="primary"
-                                    size="md"
-                                >
-                                    Edit Student
-                                </Button>
-                            </div>
-                        </Card.Text>
-                        <Card.Text>
-                            <div className="d-grid gap-2">
-                                <Button
-                                    onClick={onDelete}
-                                    variant="danger"
-                                    size="md"
-                                >
-                                    Delete Student
-                                </Button>
-                            </div>
-                        </Card.Text>
+
+                        {user?.role_id === 1 && (
+                            <>
+                                <Card.Text>
+                                    <div className="d-grid gap-2">
+                                        <Button
+                                            as={Link}
+                                            href={`/students/edit/${id}`}
+                                            variant="primary"
+                                            size="md"
+                                        >
+                                            Edit Student
+                                        </Button>
+                                    </div>
+                                </Card.Text>
+                                <Card.Text>
+                                    <div className="d-grid gap-2">
+                                        <Button
+                                            onClick={onDelete}
+                                            variant="danger"
+                                            size="md"
+                                        >
+                                            Delete Student
+                                        </Button>
+                                    </div>
+                                </Card.Text>
+                            </>
+                        )}
                     </Card.Body>
                 </Card>
             </Col>
