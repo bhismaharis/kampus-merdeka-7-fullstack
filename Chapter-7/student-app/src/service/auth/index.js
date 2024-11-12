@@ -9,7 +9,11 @@ export const login = async (request) => {
 
     // get the data if fetching succeed!
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const register = async (request) => {
@@ -29,10 +33,15 @@ export const register = async (request) => {
 
     // get the data if fetching succeed!
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
-export const profile = async (token) => {
+export const profile = async () => {
+    const token = localStorage.getItem("token");
     const response = await fetch(
         `${import.meta.env.VITE_API_URL}/auth/profile`,
         {
@@ -45,5 +54,9 @@ export const profile = async (token) => {
 
     // get data
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };

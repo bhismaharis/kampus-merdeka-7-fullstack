@@ -1,15 +1,18 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { register } from "../service/auth";
 import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
+import { setToken } from "../redux/slices/auth";
 
 export const Route = createLazyFileRoute("/register")({
     component: Register,
 });
 
 function Register() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const { token } = useSelector((state) => state.auth);
@@ -20,12 +23,25 @@ function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
 
-    useEffect(() => {
-        // get token from local storage
-        if (token) {
+    if (token) {
+        navigate({ to: "/" });
+    }
+
+    const { mutate: registerUser } = useMutation({
+        mutationFn: (body) => {
+            return register(body);
+        },
+        onSuccess: (data) => {
+            // set token to global state
+            dispatch(setToken(data?.token));
+
+            // redirect to home
             navigate({ to: "/" });
-        }
-    }, [token, navigate]);
+        },
+        onError: (err) => {
+            toast.error(err?.message);
+        },
+    });
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -42,19 +58,9 @@ function Register() {
             profilePicture,
         };
 
-        // get the data if fetching succeed!
-        const result = await register(request);
-        if (result.success) {
-            // save token to local storage
-            localStorage.setItem("token", result.data.token);
+        // hit the register API with the data
+        registerUser(request);
 
-            // redirect to home
-            window.location = "/";
-
-            return;
-        }
-
-        toast.error(result?.message);
     };
 
     return (

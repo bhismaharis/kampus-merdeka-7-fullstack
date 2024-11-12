@@ -22,14 +22,14 @@ const NavigationBar = () => {
     }, [dispatch, navigate]);
 
     const { data, isSuccess, isError } = useQuery({
-        queryKey: "profile",
+        queryKey: ["profile"],
         queryFn: profile,
         enabled: token ? true : false,
     });
 
     useEffect(() => {
         if (isSuccess) {
-            dispatch(setUser(data?.data));
+            dispatch(setUser(data));
         } else if (isError) {
             handleLogout();
         }

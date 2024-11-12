@@ -3,6 +3,8 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import Container from "react-bootstrap/Container";
 import NavigationBar from "../components/Navbar";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 export const Route = createRootRoute({
     component: () => (
@@ -19,7 +21,7 @@ export const Route = createRootRoute({
             <TanStackRouterDevtools />
 
             {/* Toast Container */}
-            <ToastContainer />
+            <ToastContainer theme="colored" />
         </>
     ),
 });

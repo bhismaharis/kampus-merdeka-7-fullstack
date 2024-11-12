@@ -19,9 +19,13 @@ export const getStudents = async (nickname, name) => {
         method: "GET",
     });
 
-    // get the data if fetching succeed!
+    // get data
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const getDetailStudent = async (id) => {
@@ -38,7 +42,11 @@ export const getDetailStudent = async (id) => {
 
     // get data
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const createStudent = async (request) => {
@@ -61,9 +69,13 @@ export const createStudent = async (request) => {
         method: "POST",
     });
 
-    // get the data if fetching succeed!
+    // get data
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const updateStudent = async (id, request) => {

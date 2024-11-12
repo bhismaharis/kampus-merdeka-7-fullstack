@@ -1,6 +1,8 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Button, Card, Col, Form, Image, Row } from "react-bootstrap";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { Row, Col, Card, Form, Button } from "react-bootstrap";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUniversities } from "../../service/university";
 import { getClasses } from "../../service/class";
 import { createStudent } from "../../service/student";
@@ -12,39 +14,45 @@ export const Route = createLazyFileRoute("/students/create")({
         <Protected roles={[1]}>
             <CreateStudent />
         </Protected>
-    )
+    ),
 });
 
 function CreateStudent() {
+    const { token } = useSelector((state) => state.auth);
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const [name, setName] = useState("");
     const [nickName, setNickName] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
-    const [currentProfilePicture, setCurrentProfilePicture] =
-        useState(undefined);
-    const [universities, setUniversities] = useState([]);
     const [universityId, setUniversityId] = useState(0);
-    const [classes, setClasses] = useState([]);
     const [classId, setClassId] = useState(0);
 
-    useEffect(() => {
-        const getUniversitiesData = async () => {
-            const result = await getUniversities();
-            if (result?.success) {
-                setUniversities(result?.data);
-            }
-        };
-        const getClassesData = async () => {
-            const result = await getClasses();
-            if (result?.success) {
-                setClasses(result?.data);
-            }
-        };
+    const { data: universities, isLoading: isLoadingUniversities } = useQuery({
+        queryKey: ["universities"],
+        queryFn: getUniversities,
+        enabled: !!token,
+    });
 
-        getUniversitiesData();
-        getClassesData();
-    }, []);
+    const { data: classes, isLoading: isLoadingClasses } = useQuery({
+        queryKey: ["classes"],
+        queryFn: getClasses,
+        enabled: !!token,
+    });
+
+    const { mutate: createStudentMutation } = useMutation({
+        mutationFn: (body) => {
+            createStudent(body);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["students"]);
+            toast.success("Student created successfully!");
+            navigate({ to: "/" });
+        },
+        onError: (err) => {
+            toast.error(err?.message);
+        },
+    });
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -56,14 +64,17 @@ function CreateStudent() {
             universityId,
             profilePicture,
         };
-        const result = await createStudent(request);
-        if (result?.success) {
-            navigate({ to: "/" });
-            return;
-        }
 
-        toast.error(result?.message);
+        createStudentMutation(request);
     };
+
+    if (isLoadingUniversities || isLoadingClasses) {
+        return (
+            <Row className="mt-4">
+                <h1>Loading...</h1>
+            </Row>
+        );
+    }
 
     return (
         <Row className="mt-5">
@@ -88,9 +99,9 @@ function CreateStudent() {
                                         placeholder="Name"
                                         required
                                         value={name}
-                                        onChange={(event) => {
-                                            setName(event.target.value);
-                                        }}
+                                        onChange={(event) =>
+                                            setName(event.target.value)
+                                        }
                                     />
                                 </Col>
                             </Form.Group>
@@ -108,16 +119,16 @@ function CreateStudent() {
                                         placeholder="Nick Name"
                                         required
                                         value={nickName}
-                                        onChange={(event) => {
-                                            setNickName(event.target.value);
-                                        }}
+                                        onChange={(event) =>
+                                            setNickName(event.target.value)
+                                        }
                                     />
                                 </Col>
                             </Form.Group>
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
-                                controlId="nick_name"
+                                controlId="university"
                             >
                                 <Form.Label column sm={3}>
                                     University
@@ -125,29 +136,31 @@ function CreateStudent() {
                                 <Col sm="9">
                                     <Form.Select
                                         aria-label="Default select example"
-                                        onChange={(event) => {
-                                            setUniversityId(event.target.value);
-                                        }}
+                                        // value={universityId}
+                                        onChange={(event) =>
+                                            setUniversityId(event.target.value)
+                                        }
                                     >
                                         <option disabled selected>
                                             Select University
                                         </option>
-                                        {universities.length > 0 &&
-                                            universities.map((university) => (
+                                        {universities?.data?.map(
+                                            (university) => (
                                                 <option
-                                                    key={university?.id}
-                                                    value={university?.id}
+                                                    key={university.id}
+                                                    value={university.id}
                                                 >
-                                                    {university?.name}
+                                                    {university.name}
                                                 </option>
-                                            ))}
+                                            )
+                                        )}
                                     </Form.Select>
                                 </Col>
                             </Form.Group>
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
-                                controlId="nick_name"
+                                controlId="class"
                             >
                                 <Form.Label column sm={3}>
                                     Class
@@ -155,22 +168,22 @@ function CreateStudent() {
                                 <Col sm="9">
                                     <Form.Select
                                         aria-label="Default select example"
-                                        onChange={(event) => {
-                                            setClassId(event.target.value);
-                                        }}
+                                        // value={classId}
+                                        onChange={(event) =>
+                                            setClassId(event.target.value)
+                                        }
                                     >
                                         <option disabled selected>
                                             Select Class
                                         </option>
-                                        {classes.length > 0 &&
-                                            classes.map((c) => (
-                                                <option
-                                                    key={c?.id}
-                                                    value={c?.id}
-                                                >
-                                                    {c?.class}
-                                                </option>
-                                            ))}
+                                        {classes?.data?.map((classItem) => (
+                                            <option
+                                                key={classItem.id}
+                                                value={classItem.id}
+                                            >
+                                                {classItem.class}
+                                            </option>
+                                        ))}
                                     </Form.Select>
                                 </Col>
                             </Form.Group>
@@ -186,29 +199,13 @@ function CreateStudent() {
                                     <Form.Control
                                         type="file"
                                         placeholder="Choose File"
-                                        required
-                                        onChange={(event) => {
+                                        onChange={(event) =>
                                             setProfilePicture(
                                                 event.target.files[0]
-                                            );
-                                            setCurrentProfilePicture(
-                                                URL.createObjectURL(
-                                                    event.target.files[0]
-                                                )
-                                            );
-                                        }}
+                                            )
+                                        }
                                         accept=".jpg,.png"
                                     />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group
-                                as={Row}
-                                className="mb-3"
-                                controlId="profilePicture"
-                            >
-                                <Form.Label column sm={3}></Form.Label>
-                                <Col sm={9}>
-                                    <Image src={currentProfilePicture} fluid />
                                 </Col>
                             </Form.Group>
                             <div className="d-grid gap-2">
@@ -224,3 +221,5 @@ function CreateStudent() {
         </Row>
     );
 }
+
+export default CreateStudent;
