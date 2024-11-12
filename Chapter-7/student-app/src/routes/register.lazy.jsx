@@ -23,10 +23,12 @@ function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
 
+    // get token from local storage
     if (token) {
         navigate({ to: "/" });
     }
 
+    // Mutation is used for POST, PUT, PATCH and DELETE
     const { mutate: registerUser } = useMutation({
         mutationFn: (body) => {
             return register(body);
@@ -50,17 +52,14 @@ function Register() {
             toast.error("Password and password confirmation must be same!");
         }
 
-        // hit the register API
+        // hit API here
         const request = {
             name,
             email,
             password,
             profilePicture,
         };
-
-        // hit the register API with the data
         registerUser(request);
-
     };
 
     return (

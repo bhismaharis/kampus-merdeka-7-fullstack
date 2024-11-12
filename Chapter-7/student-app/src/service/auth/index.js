@@ -18,7 +18,7 @@ export const login = async (request) => {
 
 export const register = async (request) => {
     const formData = new FormData();
-    formData.append("username", request.name);
+    formData.append("name", request.name);
     formData.append("email", request.email);
     formData.append("password", request.password);
     formData.append("profile_picture", request.profilePicture);

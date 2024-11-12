@@ -1,12 +1,11 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { Row, Col, Card, Form, Button } from "react-bootstrap";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button, Card, Col, Form, Image, Row } from "react-bootstrap";
 import { getUniversities } from "../../service/university";
 import { getClasses } from "../../service/class";
 import { createStudent } from "../../service/student";
 import { toast } from "react-toastify";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Protected from "../../components/Auth/Protected";
 
 export const Route = createLazyFileRoute("/students/create")({
@@ -18,39 +17,35 @@ export const Route = createLazyFileRoute("/students/create")({
 });
 
 function CreateStudent() {
-    const { token } = useSelector((state) => state.auth);
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
 
     const [name, setName] = useState("");
     const [nickName, setNickName] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
+    const [currentProfilePicture, setCurrentProfilePicture] =
+        useState(undefined);
     const [universityId, setUniversityId] = useState(0);
     const [classId, setClassId] = useState(0);
 
-    const { data: universities, isLoading: isLoadingUniversities } = useQuery({
+    const { data: universities } = useQuery({
         queryKey: ["universities"],
         queryFn: getUniversities,
-        enabled: !!token,
+        enabled: true,
     });
 
-    const { data: classes, isLoading: isLoadingClasses } = useQuery({
+    const { data: classes } = useQuery({
         queryKey: ["classes"],
         queryFn: getClasses,
-        enabled: !!token,
+        enabled: true,
     });
 
-    const { mutate: createStudentMutation } = useMutation({
-        mutationFn: (body) => {
-            createStudent(body);
-        },
+    const { mutate: create, isPending } = useMutation({
+        mutationFn: (request) => createStudent(request),
         onSuccess: () => {
-            queryClient.invalidateQueries(["students"]);
-            toast.success("Student created successfully!");
             navigate({ to: "/" });
         },
-        onError: (err) => {
-            toast.error(err?.message);
+        onError: (error) => {
+            toast.error(error?.message);
         },
     });
 
@@ -64,17 +59,8 @@ function CreateStudent() {
             universityId,
             profilePicture,
         };
-
-        createStudentMutation(request);
+        create(request);
     };
-
-    if (isLoadingUniversities || isLoadingClasses) {
-        return (
-            <Row className="mt-4">
-                <h1>Loading...</h1>
-            </Row>
-        );
-    }
 
     return (
         <Row className="mt-5">
@@ -99,9 +85,9 @@ function CreateStudent() {
                                         placeholder="Name"
                                         required
                                         value={name}
-                                        onChange={(event) =>
-                                            setName(event.target.value)
-                                        }
+                                        onChange={(event) => {
+                                            setName(event.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
@@ -119,16 +105,16 @@ function CreateStudent() {
                                         placeholder="Nick Name"
                                         required
                                         value={nickName}
-                                        onChange={(event) =>
-                                            setNickName(event.target.value)
-                                        }
+                                        onChange={(event) => {
+                                            setNickName(event.target.value);
+                                        }}
                                     />
                                 </Col>
                             </Form.Group>
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
-                                controlId="university"
+                                controlId="nick_name"
                             >
                                 <Form.Label column sm={3}>
                                     University
@@ -136,7 +122,6 @@ function CreateStudent() {
                                 <Col sm="9">
                                     <Form.Select
                                         aria-label="Default select example"
-                                        // value={universityId}
                                         onChange={(event) =>
                                             setUniversityId(event.target.value)
                                         }
@@ -144,23 +129,23 @@ function CreateStudent() {
                                         <option disabled selected>
                                             Select University
                                         </option>
-                                        {universities?.data?.map(
-                                            (university) => (
+                                        {universities &&
+                                            universities?.length > 0 &&
+                                            universities?.map((university) => (
                                                 <option
-                                                    key={university.id}
-                                                    value={university.id}
+                                                    key={university?.id}
+                                                    value={university?.id}
                                                 >
-                                                    {university.name}
+                                                    {university?.name}
                                                 </option>
-                                            )
-                                        )}
+                                            ))}
                                     </Form.Select>
                                 </Col>
                             </Form.Group>
                             <Form.Group
                                 as={Row}
                                 className="mb-3"
-                                controlId="class"
+                                controlId="nick_name"
                             >
                                 <Form.Label column sm={3}>
                                     Class
@@ -168,7 +153,6 @@ function CreateStudent() {
                                 <Col sm="9">
                                     <Form.Select
                                         aria-label="Default select example"
-                                        // value={classId}
                                         onChange={(event) =>
                                             setClassId(event.target.value)
                                         }
@@ -176,14 +160,16 @@ function CreateStudent() {
                                         <option disabled selected>
                                             Select Class
                                         </option>
-                                        {classes?.data?.map((classItem) => (
-                                            <option
-                                                key={classItem.id}
-                                                value={classItem.id}
-                                            >
-                                                {classItem.class}
-                                            </option>
-                                        ))}
+                                        {classes &&
+                                            classes?.length > 0 &&
+                                            classes?.map((c) => (
+                                                <option
+                                                    key={c?.id}
+                                                    value={c?.id}
+                                                >
+                                                    {c?.class}
+                                                </option>
+                                            ))}
                                     </Form.Select>
                                 </Col>
                             </Form.Group>
@@ -199,17 +185,37 @@ function CreateStudent() {
                                     <Form.Control
                                         type="file"
                                         placeholder="Choose File"
-                                        onChange={(event) =>
+                                        required
+                                        onChange={(event) => {
                                             setProfilePicture(
                                                 event.target.files[0]
-                                            )
-                                        }
+                                            );
+                                            setCurrentProfilePicture(
+                                                URL.createObjectURL(
+                                                    event.target.files[0]
+                                                )
+                                            );
+                                        }}
                                         accept=".jpg,.png"
                                     />
                                 </Col>
                             </Form.Group>
+                            <Form.Group
+                                as={Row}
+                                className="mb-3"
+                                controlId="profilePicture"
+                            >
+                                <Form.Label column sm={3}></Form.Label>
+                                <Col sm={9}>
+                                    <Image src={currentProfilePicture} fluid />
+                                </Col>
+                            </Form.Group>
                             <div className="d-grid gap-2">
-                                <Button type="submit" variant="primary">
+                                <Button
+                                    type="submit"
+                                    disabled={isPending}
+                                    variant="primary"
+                                >
                                     Create Student
                                 </Button>
                             </div>
@@ -221,5 +227,3 @@ function CreateStudent() {
         </Row>
     );
 }
-
-export default CreateStudent;

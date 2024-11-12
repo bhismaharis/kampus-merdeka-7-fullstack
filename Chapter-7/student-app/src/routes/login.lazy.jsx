@@ -15,7 +15,7 @@ function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { token } = useSelector((state) => state.auth);   
+    const { token } = useSelector((state) => state.auth);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -24,7 +24,7 @@ function Login() {
         navigate({ to: "/" });
     }
 
-    // Mutation is used for POST, PUT, PATCH, DELETE
+    // Mutation is used for POST, PUT, PATCH and DELETE
     const { mutate: loginUser } = useMutation({
         mutationFn: (body) => {
             return login(body);
@@ -38,8 +38,7 @@ function Login() {
         },
         onError: (err) => {
             toast.error(err?.message);
-        }
-
+        },
     });
 
     const onSubmit = async (event) => {
@@ -50,7 +49,7 @@ function Login() {
         const body = {
             email,
             password,
-        };        
+        };
 
         // hit the login API with the data
         loginUser(body);
