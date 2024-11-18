@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken } from "../redux/slices/auth";
-import { login } from "../service/auth";
+import { login, loginWithGoogle } from "../service/auth";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
@@ -32,6 +33,24 @@ function Login() {
         onSuccess: (data) => {
             // set token to global state
             dispatch(setToken(data?.token));
+            localStorage.setItem("token", data?.token);
+
+            // redirect to home
+            navigate({ to: "/" });
+        },
+        onError: (err) => {
+            toast.error(err?.message);
+        },
+    });
+
+    const { mutate: loginWithGoogleMutation } = useMutation({
+        mutationFn: (accessToken) => {
+            return loginWithGoogle(accessToken);
+        },
+        onSuccess: (data) => {
+            // set token to global state
+            dispatch(setToken(data?.token));
+            console.log(data);
 
             // redirect to home
             navigate({ to: "/" });
@@ -54,6 +73,13 @@ function Login() {
         // hit the login API with the data
         loginUser(body);
     };
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: (tokenResponse) => {
+            loginWithGoogleMutation(tokenResponse.access_token);
+        },
+        onError: (err) => console.log(err),
+    });
 
     return (
         <Row className="mt-5">
@@ -102,9 +128,14 @@ function Login() {
                                     />
                                 </Col>
                             </Form.Group>
-                            <div className="d-grid gap-2">
+                            <div className="d-grid gap-2 mb-2">
                                 <Button type="submit" variant="primary">
                                     Login
+                                </Button>
+                            </div>
+                            <div className="d-grid gap-2">
+                                <Button onClick={googleLogin} variant="primary">
+                                    Login with Google
                                 </Button>
                             </div>
                         </Form>

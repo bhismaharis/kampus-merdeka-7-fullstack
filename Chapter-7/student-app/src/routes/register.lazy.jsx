@@ -6,6 +6,8 @@ import { register } from "../service/auth";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import { setToken } from "../redux/slices/auth";
+import { loginWithGoogle } from "../service/auth";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export const Route = createLazyFileRoute("/register")({
     component: Register,
@@ -45,6 +47,23 @@ function Register() {
         },
     });
 
+    const { mutate: loginWithGoogleMutation } = useMutation({
+        mutationFn: (accessToken) => {
+            return loginWithGoogle(accessToken);
+        },
+        onSuccess: (data) => {
+            // set token to global state
+            dispatch(setToken(data?.token));
+            localStorage.setItem("token", data?.token);
+
+            // redirect to home
+            navigate({ to: "/" });
+        },
+        onError: (err) => {
+            toast.error(err?.message);
+        },
+    });
+
     const onSubmit = async (event) => {
         event.preventDefault();
 
@@ -61,6 +80,13 @@ function Register() {
         };
         registerUser(request);
     };
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: (tokenResponse) => {
+            loginWithGoogleMutation(tokenResponse.access_token);
+        },
+        onError: (err) => console.log(err),
+    });
 
     return (
         <Row className="mt-5">
@@ -177,9 +203,14 @@ function Register() {
                                     />
                                 </Col>
                             </Form.Group>
-                            <div className="d-grid gap-2">
+                            <div className="d-grid gap-2 mb-2">
                                 <Button type="submit" variant="primary">
                                     Register
+                                </Button>
+                            </div>
+                            <div className="d-grid gap-2">
+                                <Button onClick={googleLogin} variant="primary">
+                                    Register with Google
                                 </Button>
                             </div>
                         </Form>

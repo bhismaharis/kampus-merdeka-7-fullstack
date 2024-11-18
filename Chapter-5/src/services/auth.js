@@ -60,6 +60,33 @@ exports.login = async (data) => {
     };
 };
 
+exports.googleLogin = async (accessToken) => {
+    // get information of access token by google api
+    const { email, name, picture } = await usersRepository.googleLogin(
+        accessToken
+    );
+
+    // check is user already have an account
+    let user = await usersRepository.getUserByEmail(email);
+    if (!user) {
+        // register the user
+        user = await usersRepository.createUser({
+            email,
+            name,
+            profile_picture: picture,
+            password: "",
+        });
+    }
+
+    // create the token
+    const token = createToken(user);
+
+    // don't forget to remove the password object, if not removed it will be displayed in response
+    delete user.password;
+
+    return { user, token };
+};
+
 const createToken = (user) => {
     // generate token with jwt
     const payload = {

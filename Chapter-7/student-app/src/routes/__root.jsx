@@ -5,10 +5,11 @@ import NavigationBar from "../components/Navbar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const Route = createRootRoute({
     component: () => (
-        <>
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
             {/* Navbar */}
             <NavigationBar />
 
@@ -22,6 +23,6 @@ export const Route = createRootRoute({
 
             {/* Toast Container */}
             <ToastContainer theme="colored" />
-        </>
+        </GoogleOAuthProvider>
     ),
 });

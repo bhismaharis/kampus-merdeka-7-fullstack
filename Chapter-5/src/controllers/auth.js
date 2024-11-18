@@ -11,6 +11,11 @@ exports.login = async (req, res, next) => {
     successResponse(res, data);
 };
 
+exports.googleLogin = async (req, res, next) => {
+    const data = await authServices.googleLogin(req.body.access_token);
+    successResponse(res, data);
+};
+
 exports.getProfile = async (req, res, next) => {
     const data = req.user;
     delete data.password;
